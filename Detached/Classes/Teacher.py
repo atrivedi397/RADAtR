@@ -9,12 +9,13 @@ import Detached.Global.Variables.varFile1 as Var
 
 # Teacher Data Structure Definition
 class Teacher:
-    def __init__(self, name=None, dept=None, rank=None, school=None, uid=None, max_lec=None, min_lec=None,
+    def __init__(self, name=None, dept=None, rank=None, school=None, course=None, uid=None, max_lec=None, min_lec=None,
                  sem_taught=None):
         self.name = name
         self.department = dept
         self.rank = rank
         self.school = school
+        self.course = course   # added for new teachers
         self.uID = uid  # String
         self.maxLectures = max_lec  # per week
         self.minLectures = min_lec  # per week
@@ -48,7 +49,8 @@ class Teacher:
         pass
 
     def add_teacher(self):
-        document = {"name": self.name, "department": self.department, "school": self.school, "uid": self.uID,
+        document = {"name": self.name, "department": self.department, "school": self.school, "course": self.course,
+                    "uid": self.uID,
                     "rank": self.rank, "max_l": self.maxLectures, "min_l": self.minLectures,
                     "semester_teaching": [{self.department: self.semestersTeaching}],
                     "subjects": self.subjects,
