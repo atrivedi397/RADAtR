@@ -1,16 +1,13 @@
 from PyQt5.QtWidgets import *
+from Detached.Global.Functions.IndependentFunctions import get_list_of_subject_for
 
 
 class TimeTableWindow:
     def __init__(self, base=None):
         # dependencies
-        self.teachers = ["Manoj Kumar", "Narendra Kumar", "Santosh Kumar Dwivedi", "Vipin Saxena", "Deepa Raj", "Shalini Chandra"]
-        self.subjects = ["MCA-401: Database Management System",
-                         "MCA-402: Compiler Design",
-                         "MCA-403: Data Communication & Computer Networks",
-                         "MCA-404: Modeling and Simulation"]
-
-        self.semesterList = ["1", "2", "3", "4", "5", "6"]
+        self.teachers = ["None", "Shared", "Manoj Kumar", "Narendra Kumar", "Santosh Kumar Dwivedi", "Vipin Saxena", "Deepa Raj", "Shalini Chandra"]
+        self.semesterList = ["-", "1", "2", "3", "4", "5", "6"]
+        self.windowAlreadyOpen = False
 
         # This is the 'Create' Window
         self.createTimeTableWindow = QWidget(base)
@@ -25,7 +22,7 @@ class TimeTableWindow:
         # input fields of the window
         self.semesterField = QComboBox(self.createTimeTableWindow)
         self.semesterField.addItems(self.semesterList)                 # list values must be passed
-        self.semesterField.currentIndexChanged.connect(self.subject_mappings)
+        self.semesterField.currentIndexChanged.connect(self.test_function)
         self.semesterField.setFixedWidth(60)
         self.batchField = QLineEdit()
         self.batchField.setFixedWidth(60)
@@ -40,18 +37,16 @@ class TimeTableWindow:
         self.horizontalLine.setFrameShape(QFrame.HLine)
         self.horizontalLine.setFrameShadow(QFrame.Sunken)
 
+        # putting main heading in the first row
+        self.firstRow = QHBoxLayout(self.createTimeTableWindow)
+        self.firstRow.addWidget(self.windowHeading)
+
         # form layout for all fields (pair of label and field)
         self.semRow = QFormLayout(self.createTimeTableWindow)
         self.semRow.addRow(QLabel("For Semester"), self.semesterField)
         self.semRow.addRow(QLabel("For Batch"), self.batchField)
         self.semRow.addRow(QLabel('Batch start-timing (in 24-hours format)'),
                            self.timingField)
-        self.semRow.addWidget(self.horizontalLine)
-
-        # putting main heading in the first row
-        self.firstRow = QHBoxLayout(self.createTimeTableWindow)
-        self.firstRow.addWidget(self.windowHeading)
-        self.firstRow.addStretch(1)
 
         # 'Generate' and 'Cancel' buttons
         self.finalButton = QHBoxLayout(self.createTimeTableWindow)
@@ -74,35 +69,48 @@ class TimeTableWindow:
         self.rows.addWidget(self.horizontalLine)
         self.rows.addLayout(self.finalButton)
         self.createTimeTableWindow.setLayout(self.rows)
+        self.createTimeTableWindow.setContentsMargins(40, 0, 0, 0)
+
+    def test_function(self):
+        if self.windowAlreadyOpen:
+            self.close_window()
+            self.createTimeTableWindow.show()
+            self.subject_mappings()
+        else:
+            self.subject_mappings()
 
     def subject_mappings(self):
+        self.windowAlreadyOpen = True
+
         self.dynamicMappingList.addWidget(QLabel('Assign the following subjects with respective lecturer'))
         self.dynamicMappingList.addStretch(1)
 
         # temporary lists
-        teacher_comboboxes = []
+        teacher_combo_boxes = []                            # multiple comboBoxes are required to show dropDowns for each teacher
         subject_stack = []
+        
+        course = "MCA"                                      # This value is dependent on the Admin attribute
+        semester = self.semesterField.currentIndex()        # getting semester number
+        
+        # getting list of subjects for the desired course and semester
+        subject_list = get_list_of_subject_for(course, semester)
 
-        if len(self.subjects) >= len(self.teachers):
-            index = len(self.teachers)
-        else:
-            index = len(self.subjects)
-
-        # creating list of lists
-        for t in range(len(self.teachers)):
+        # creating list of comboBoxes with having same dropDown items
+        for t in range(len(subject_list)):                  # Teacher comboBox will be created for each subject
             teacher_options = QComboBox()
             teacher_options.setFixedWidth(400)
-            teacher_options.addItems(self.teachers)
-            teacher_comboboxes.append(teacher_options)
+            teacher_options.addItems(self.teachers)         # same list of teacher is added as each comboBox items
+            teacher_combo_boxes.append(teacher_options)     # each dropDown is added to the list
 
-        for i in range(index):
-            subject = QLabel(self.subjects[i])
+        for i in range(len(subject_list)):
+            subject = QLabel(subject_list[i])
             subject_stack.append(subject)
             self.dynamicMappingList.addWidget(subject_stack[i])
-            self.dynamicMappingList.addWidget(teacher_comboboxes[i])
+            self.dynamicMappingList.addWidget(teacher_combo_boxes[i])
 
         self.generateButton.setDisabled(False)
 
+    # function to close/hide dynamic content (teacher and subject lists)
     def close_window(self):
         # external code to empty the (dynamic layout)
         while self.dynamicMappingList.count() > 0:
@@ -114,5 +122,6 @@ class TimeTableWindow:
             if widget:
                 widget.close()
 
-        # closing the open window
+        # closing the opened window
         self.createTimeTableWindow.close()
+        self.windowAlreadyOpen = False

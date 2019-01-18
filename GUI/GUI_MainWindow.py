@@ -1,7 +1,7 @@
 import sys
-from GUI.ModulePanel import *
-from GUI.NavigationPanel import *
-from GUI.CreateTimeTable import *
+from GUI.GUI_ModulePanel import *
+from GUI.GUI_NavigationPanel import *
+from GUI.GUI_TimeTable_Create import *
 
 
 class MainWindow(QMainWindow):
@@ -9,7 +9,7 @@ class MainWindow(QMainWindow):
         super().__init__(parent)
 
         # main window properties
-        self.setFixedSize(800, 600)
+        self.setFixedSize(1200, 720)
         self.setWindowTitle('Main Window')
 
         # menu bar settings
@@ -25,7 +25,7 @@ class MainWindow(QMainWindow):
 
         # central widget (main parent widget)
         self.container = QWidget(self)
-        self.container.setGeometry(0, 21, 800, 558)      # 21x2 px is taken by menu(top) and status bar(bottom)
+        self.container.setGeometry(0, 21, 1200, 678)      # 21x2 px is taken by menu(top) and status bar(bottom)
 
         # layout for central widget (container)
         self.containerLayout = QHBoxLayout(self.container)
