@@ -1,6 +1,4 @@
-from PyQt5.QtWidgets import *
-from Detached.Global.Functions.IndependentFunctions import get_list_of_subject_for
-from testFile1 import *
+from GUI.GUI_TimeTable_Create_MapWindow import *
 
 
 class TimeTableWindow:
@@ -30,10 +28,17 @@ class TimeTableWindow:
         self.generateButton = QPushButton('Generate')                   # creating 'Generate' button
         self.cancelButton = QPushButton('Cancel')                       # creating 'Cancel' button
 
-        # creating a horizontal line
+        # creating a horizontal line 1 (for being below the semester, batch, timings inputs)
         self.HLine = QFrame(self.createTimeTableWindow)
         self.HLine.setFrameShape(QFrame.HLine)
         self.HLine.setFrameShadow(QFrame.Sunken)
+
+        """To show horizontal lines at 2 places, we need to have 2 different horizontal lines"""
+        # creating a horizontal line 2 (for being above the 'generate' and 'cancel' button)
+        self.HLine2 = QFrame(self.createTimeTableWindow)
+        self.HLine2.setFrameShape(QFrame.HLine)
+        self.HLine2.setFrameShadow(QFrame.Sunken)
+        self.HLine.hide()                                               # hiding unless mapping list is generated
 
         # layout containing 4 vertical sections (for heading, sem-batch-timing input, mappings and generate-cancel buttons)
         self.fourSections = QVBoxLayout(self.createTimeTableWindow)     # main container for all 4 sub-layouts
@@ -52,7 +57,7 @@ class TimeTableWindow:
 
         # sub-sub layout3 for timing only
         self.timingForm = QFormLayout(self.createTimeTableWindow)
-        self.timingForm.addRow(QLabel('Start Timing (in 24 hours'), self.timingField)
+        self.timingForm.addRow(QLabel('Start Timing (in 24 hours)'), self.timingField)
 
         # putting all 3 sub-sub layouts in sub-layout (ie 2nd section)
         self.secondSection.addLayout(self.semForm)
@@ -73,12 +78,20 @@ class TimeTableWindow:
         # putting sub layouts in the main layout (ie fourSections)
         self.fourSections.addWidget(self.windowHeading)                 # heading acts as the first section
         self.fourSections.addLayout(self.secondSection)
+        self.fourSections.addLayout(self.thirdSection, 5)
         self.fourSections.addStretch(1)
-        self.fourSections.addLayout(self.thirdSection, 4)
-        self.fourSections.addWidget(self.HLine)                         # putting a horizontal line
+        self.fourSections.addWidget(self.HLine2)                         # putting a horizontal line
         self.fourSections.addLayout(self.fourthSection)
+        self.fourSections.setContentsMargins(40, 10, 20, 10)
 
         self.createTimeTableWindow.setLayout(self.fourSections)
 
     def test_function(self):
-        pass
+        # creating class to show mapping options
+        external_class = MapWindow(self.createTimeTableWindow)
+        self.thirdSection.addWidget(self.HLine)                         # to separate 2nd and 3rd sections
+        self.HLine.show()
+        self.thirdSection.addWidget(external_class.mapSubWindow)        # displaying mapping options in 3rd Section
+        self.thirdSection.addStretch(2)                                 # so that the remaining space is at bottom only
+        self.thirdSection.setContentsMargins(0, 20, 0, 0)
+        external_class.mapping_options(self.semesterField.currentIndex())
