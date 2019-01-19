@@ -1,13 +1,12 @@
 from PyQt5.QtWidgets import *
 from Detached.Global.Functions.IndependentFunctions import get_list_of_subject_for
+from testFile1 import *
 
 
 class TimeTableWindow:
     def __init__(self, base=None):
         # dependencies
-        self.teachers = ["None", "Shared", "Manoj Kumar", "Narendra Kumar", "Santosh Kumar Dwivedi", "Vipin Saxena", "Deepa Raj", "Shalini Chandra"]
         self.semesterList = ["-", "1", "2", "3", "4", "5", "6"]
-        self.windowAlreadyOpen = False
 
         # This is the 'Create' Window
         self.createTimeTableWindow = QWidget(base)
@@ -20,108 +19,66 @@ class TimeTableWindow:
                                          'margin-bottom: 5px;')
 
         # input fields of the window
-        self.semesterField = QComboBox(self.createTimeTableWindow)
-        self.semesterField.addItems(self.semesterList)                 # list values must be passed
+        self.semesterField = QComboBox(self.createTimeTableWindow)      # for semester no. input
+        self.semesterField.addItems(self.semesterList)                  # list values must be passed
         self.semesterField.currentIndexChanged.connect(self.test_function)
         self.semesterField.setFixedWidth(60)
-        self.batchField = QLineEdit()
+        self.batchField = QLineEdit()                                   # for batch input
         self.batchField.setFixedWidth(60)
-        self.timingField = QLineEdit()
+        self.timingField = QLineEdit()                                  # for timing input (24 hours)
         self.timingField.setFixedWidth(80)
+        self.generateButton = QPushButton('Generate')                   # creating 'Generate' button
+        self.cancelButton = QPushButton('Cancel')                       # creating 'Cancel' button
 
-        # layout for rows
-        self.rows = QVBoxLayout(self.createTimeTableWindow)
+        # creating a horizontal line
+        self.HLine = QFrame(self.createTimeTableWindow)
+        self.HLine.setFrameShape(QFrame.HLine)
+        self.HLine.setFrameShadow(QFrame.Sunken)
 
-        # properties of the horizontal line
-        self.horizontalLine = QFrame(self.createTimeTableWindow)
-        self.horizontalLine.setFrameShape(QFrame.HLine)
-        self.horizontalLine.setFrameShadow(QFrame.Sunken)
+        # layout containing 4 vertical sections (for heading, sem-batch-timing input, mappings and generate-cancel buttons)
+        self.fourSections = QVBoxLayout(self.createTimeTableWindow)     # main container for all 4 sub-layouts
 
-        # putting main heading in the first row
-        self.firstRow = QHBoxLayout(self.createTimeTableWindow)
-        self.firstRow.addWidget(self.windowHeading)
+        # there's no need to create a sub-layout for heading explicitly. Heading is the first section in its own.
+        # sub-layout for semester, batch and timing
+        self.secondSection = QHBoxLayout(self.createTimeTableWindow)    # will contain sem, batch, timing input horizontally
 
-        # form layout for all fields (pair of label and field)
-        self.semRow = QFormLayout(self.createTimeTableWindow)
-        self.semRow.addRow(QLabel("For Semester"), self.semesterField)
-        self.semRow.addRow(QLabel("For Batch"), self.batchField)
-        self.semRow.addRow(QLabel('Batch start-timing (in 24-hours format)'),
-                           self.timingField)
+        # sub-sub layout1 for semester only
+        self.semForm = QFormLayout(self.createTimeTableWindow)          # for sem input, will be nested in 2nd section
+        self.semForm.addRow(QLabel('For Semester'), self.semesterField)
 
-        # 'Generate' and 'Cancel' buttons
-        self.finalButton = QHBoxLayout(self.createTimeTableWindow)
-        self.generateButton = QPushButton('Generate')
-        self.generateButton.setDisabled(True)
-        self.cancelButton = QPushButton('Cancel')
-        self.cancelButton.clicked.connect(self.close_window)
-        self.finalButton.addStretch(5)
-        self.finalButton.addWidget(self.generateButton)
-        self.finalButton.addWidget(self.cancelButton)
+        # sub-sub layout2 for batch only
+        self.batchForm = QFormLayout(self.createTimeTableWindow)
+        self.batchForm.addRow(QLabel('For Batch'), self.batchField)
 
-        # dynamic content
-        self.dynamicMappingList = QVBoxLayout(self.createTimeTableWindow)
+        # sub-sub layout3 for timing only
+        self.timingForm = QFormLayout(self.createTimeTableWindow)
+        self.timingForm.addRow(QLabel('Start Timing (in 24 hours'), self.timingField)
 
-        # adding layouts and widgets into rows
-        self.rows.addLayout(self.firstRow)
-        self.rows.addLayout(self.semRow)
-        self.rows.addLayout(self.dynamicMappingList, 2)
-        self.rows.addStretch(1)
-        self.rows.addWidget(self.horizontalLine)
-        self.rows.addLayout(self.finalButton)
-        self.createTimeTableWindow.setLayout(self.rows)
-        self.createTimeTableWindow.setContentsMargins(40, 0, 0, 0)
+        # putting all 3 sub-sub layouts in sub-layout (ie 2nd section)
+        self.secondSection.addLayout(self.semForm)
+        self.secondSection.addStretch(1)
+        self.secondSection.addLayout(self.batchForm)
+        self.secondSection.addStretch(1)
+        self.secondSection.addLayout(self.timingForm)
+
+        # sub-layout for dynamic contents (ie mapping of subjects and teachers, the 3rd Section)
+        self.thirdSection = QVBoxLayout(self.createTimeTableWindow)
+
+        # sub-layout for 'generate' and 'cancel' button (ie 4th Section)
+        self.fourthSection = QHBoxLayout(self.createTimeTableWindow)
+        self.fourthSection.addStretch(1)
+        self.fourthSection.addWidget(self.generateButton)
+        self.fourthSection.addWidget(self.cancelButton)
+
+        # putting sub layouts in the main layout (ie fourSections)
+        self.fourSections.addWidget(self.windowHeading)                 # heading acts as the first section
+        self.fourSections.addLayout(self.secondSection)
+        self.fourSections.addStretch(1)
+        self.fourSections.addLayout(self.thirdSection, 4)
+        self.fourSections.addWidget(self.HLine)                         # putting a horizontal line
+        self.fourSections.addLayout(self.fourthSection)
+
+        self.createTimeTableWindow.setLayout(self.fourSections)
 
     def test_function(self):
-        if self.windowAlreadyOpen:
-            self.close_window()
-            self.createTimeTableWindow.show()
-            self.subject_mappings()
-        else:
-            self.subject_mappings()
-
-    def subject_mappings(self):
-        self.windowAlreadyOpen = True
-
-        self.dynamicMappingList.addWidget(QLabel('Assign the following subjects with respective lecturer'))
-        self.dynamicMappingList.addStretch(1)
-
-        # temporary lists
-        teacher_combo_boxes = []                            # multiple comboBoxes are required to show dropDowns for each teacher
-        subject_stack = []
-        
-        course = "MCA"                                      # This value is dependent on the Admin attribute
-        semester = self.semesterField.currentIndex()        # getting semester number
-        
-        # getting list of subjects for the desired course and semester
-        subject_list = get_list_of_subject_for(course, semester)
-
-        # creating list of comboBoxes with having same dropDown items
-        for t in range(len(subject_list)):                  # Teacher comboBox will be created for each subject
-            teacher_options = QComboBox()
-            teacher_options.setFixedWidth(400)
-            teacher_options.addItems(self.teachers)         # same list of teacher is added as each comboBox items
-            teacher_combo_boxes.append(teacher_options)     # each dropDown is added to the list
-
-        for i in range(len(subject_list)):
-            subject = QLabel(subject_list[i])
-            subject_stack.append(subject)
-            self.dynamicMappingList.addWidget(subject_stack[i])
-            self.dynamicMappingList.addWidget(teacher_combo_boxes[i])
-
-        self.generateButton.setDisabled(False)
-
-    # function to close/hide dynamic content (teacher and subject lists)
-    def close_window(self):
-        # external code to empty the (dynamic layout)
-        while self.dynamicMappingList.count() > 0:
-            item = self.dynamicMappingList.takeAt(0)
-            if not item:
-                continue
-
-            widget = item.widget()
-            if widget:
-                widget.close()
-
-        # closing the opened window
-        self.createTimeTableWindow.close()
-        self.windowAlreadyOpen = False
+        pass
