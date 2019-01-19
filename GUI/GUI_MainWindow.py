@@ -9,7 +9,7 @@ class MainWindow(QMainWindow):
         super().__init__(parent)
 
         # main window properties
-        self.setFixedSize(1200, 720)
+        self.setFixedSize(1080, 682)
         self.setWindowTitle('Main Window')
 
         # menu bar settings
@@ -25,7 +25,7 @@ class MainWindow(QMainWindow):
 
         # central widget (main parent widget)
         self.container = QWidget(self)
-        self.container.setGeometry(0, 21, 1200, 678)      # 21x2 px is taken by menu(top) and status bar(bottom)
+        self.container.setGeometry(0, 21, 1080, 640)      # 21x2 px is taken by menu(top) and status bar(bottom)
 
         # layout for central widget (container)
         self.containerLayout = QHBoxLayout(self.container)
