@@ -53,7 +53,7 @@ class MapWindow:
         # self.base.generateButton.setDisabled(False)
 
     # function to close/hide dynamic content (teacher and subject lists)
-    def close_window(self):
+    def close_map_window(self):
         # external code to empty the (dynamic layout)
         while self.mapArea.count() > 0:
             item = self.mapArea.takeAt(0)
@@ -65,4 +65,4 @@ class MapWindow:
                 widget.close()
 
         # closing the opened window
-        # self.dynamicContent.close()
+        self.mapSubWindow.close()

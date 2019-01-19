@@ -5,9 +5,14 @@ class TimeTableWindow:
     def __init__(self, base=None):
         # dependencies
         self.semesterList = ["-", "1", "2", "3", "4", "5", "6"]
+        self.alreadyCreated = False
+        self.parent = base
 
         # This is the 'Create' Window
         self.createTimeTableWindow = QWidget(base)
+
+        # creating class which is used in showing the mapping options
+        self.mapSubWinClass = MapWindow(self.createTimeTableWindow)
 
         # text widgets for the window
         self.windowHeading = QLabel('Create Time Table')               # window Heading Text
@@ -27,6 +32,7 @@ class TimeTableWindow:
         self.timingField.setFixedWidth(80)
         self.generateButton = QPushButton('Generate')                   # creating 'Generate' button
         self.cancelButton = QPushButton('Cancel')                       # creating 'Cancel' button
+        self.cancelButton.clicked.connect(self.close_create_window)
 
         # creating a horizontal line 1 (for being below the semester, batch, timings inputs)
         self.HLine = QFrame(self.createTimeTableWindow)
@@ -65,6 +71,7 @@ class TimeTableWindow:
         self.secondSection.addLayout(self.batchForm)
         self.secondSection.addStretch(1)
         self.secondSection.addLayout(self.timingForm)
+        self.secondSection.setContentsMargins(0, 0, 0, 20)
 
         # sub-layout for dynamic contents (ie mapping of subjects and teachers, the 3rd Section)
         self.thirdSection = QVBoxLayout(self.createTimeTableWindow)
@@ -80,18 +87,48 @@ class TimeTableWindow:
         self.fourSections.addLayout(self.secondSection)
         self.fourSections.addLayout(self.thirdSection, 5)
         self.fourSections.addStretch(1)
-        self.fourSections.addWidget(self.HLine2)                         # putting a horizontal line
+        self.fourSections.addWidget(self.HLine2)                        # putting a horizontal line
         self.fourSections.addLayout(self.fourthSection)
         self.fourSections.setContentsMargins(40, 10, 20, 10)
 
         self.createTimeTableWindow.setLayout(self.fourSections)
 
     def test_function(self):
-        # creating class to show mapping options
-        external_class = MapWindow(self.createTimeTableWindow)
-        self.thirdSection.addWidget(self.HLine)                         # to separate 2nd and 3rd sections
+        if not self.alreadyCreated:
+            self.generate_list()
+        else:
+            self.empty_third_section()
+            self.generate_list()
+            self.mapSubWinClass.mapSubWindow.show()
+
+    def generate_list(self):
+        self.thirdSection.addWidget(self.HLine)
         self.HLine.show()
-        self.thirdSection.addWidget(external_class.mapSubWindow)        # displaying mapping options in 3rd Section
+        self.thirdSection.addWidget(self.mapSubWinClass.mapSubWindow)   # displaying mapping options in 3rd Section
         self.thirdSection.addStretch(2)                                 # so that the remaining space is at bottom only
-        self.thirdSection.setContentsMargins(0, 20, 0, 0)
-        external_class.mapping_options(self.semesterField.currentIndex())
+        self.mapSubWinClass.mapping_options(self.semesterField.currentIndex())
+        self.alreadyCreated = True
+
+    def empty_third_section(self):
+        self.mapSubWinClass.close_map_window()
+
+        # removing widgets from 3rd section layout
+        while self.thirdSection.count() > 0:
+            item = self.thirdSection.takeAt(0)
+            if not item:
+                continue
+
+            widget = item.widget()
+            if widget:
+                widget.close()
+
+    def close_create_window(self):
+        self.mapSubWinClass.close_map_window()
+        del self.mapSubWinClass
+        self.mapSubWinClass = MapWindow(self.parent)
+        self.alreadyCreated = False
+        self.HLine.hide()
+        self.empty_third_section()
+
+        # closing create time table window
+        self.createTimeTableWindow.close()
