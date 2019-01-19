@@ -53,9 +53,7 @@ def get_list_of_subject_for(course, semester):
     sub_list = []
     course_sem = str(str(course) + "." + str(semester))
     cursor = db[collection].find_one({course: {"$exists": "true"}}, {course_sem: "true", "_id": 0})
-    print(cursor)
     for subject in cursor[str(course)][str(semester)]:
         sub_list.append(subject)
-    print(sub_list)
     return sub_list
 
