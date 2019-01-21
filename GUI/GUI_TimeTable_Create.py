@@ -93,14 +93,18 @@ class TimeTableWindow:
 
         self.createTimeTableWindow.setLayout(self.fourSections)
 
+    # shows the subject and teacher list only if it's not already created or regenerates it
     def test_function(self):
-        if not self.alreadyCreated:
+        if self.semesterField.currentText() == '-':                     # if no semester is chosen,
+            self.empty_third_section()                                  # close the mapping list (if already created)
+        elif not self.alreadyCreated:
             self.generate_list()
         else:
             self.empty_third_section()
             self.generate_list()
             self.mapSubWinClass.mapSubWindow.show()
 
+    # generate list of subjects and teachers to map
     def generate_list(self):
         self.thirdSection.addWidget(self.HLine)
         self.HLine.show()
@@ -109,6 +113,7 @@ class TimeTableWindow:
         self.mapSubWinClass.mapping_options(self.semesterField.currentIndex())
         self.alreadyCreated = True
 
+    # to clear the subject-teacher mapping list for either new list or for closing it
     def empty_third_section(self):
         self.mapSubWinClass.close_map_window()
 
@@ -122,6 +127,7 @@ class TimeTableWindow:
             if widget:
                 widget.close()
 
+    # to close entire 'create Time Table' window
     def close_create_window(self):
         self.mapSubWinClass.close_map_window()
         del self.mapSubWinClass
