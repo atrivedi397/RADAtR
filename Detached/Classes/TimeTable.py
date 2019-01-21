@@ -1,5 +1,5 @@
 from Detached.Global.Variables.varFile1 import maximumSlots
-
+from Detached.Global.Configurations.ConnectionEstablishment import *
 
 # class for generating Time Table for a single batch
 class TimeTable:
@@ -30,3 +30,19 @@ class TimeTable:
     def random(self):
         # picks teachers randomly
         pass
+
+
+"""Argument to this function should be of type 
+value = [{"21136": ["System Programming", "Programming Lab-2"]},
+         {"21135": ["CBOT", "Programming Lab-3"]}]
+"""
+
+
+def update_subjects_of_teachers(list_of_dictionaries):
+    for index in range(len(list_of_dictionaries)):
+        for key, values in list_of_dictionaries[index].items():
+            db[teacher_collection].find_one_and_update({"uid": str(key)},
+                                                       {"$set": {"subjects": values}})
+
+
+# update_subjects_of_teachers(value)
