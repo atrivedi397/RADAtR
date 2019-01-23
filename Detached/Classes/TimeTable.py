@@ -1,6 +1,7 @@
 from Detached.Global.Variables.varFile1 import maximumSlots
 from Detached.Global.Configurations.ConnectionEstablishment import *
 
+
 # class for generating Time Table for a single batch
 class TimeTable:
     def __init__(self):
@@ -32,7 +33,33 @@ class TimeTable:
         pass
 
 
-"""Argument to this function should be of type 
+def fetch_empty_slots(course):
+    empty_slots = db[teacher_collection].find({"course": str(course)},
+                                              {"_id": 0, "empty_slots": "true",
+                                               "name": "true", "uid": "true"})
+
+    names, uid, slots = [], [], []
+    for value in empty_slots:
+        names.append(value["name"])
+        uid.append(value["uid"])
+        slots.append(value["empty_slots"])
+
+    return names, uid, slots
+
+
+def random(day, slot_to_check):
+    q_string = "empty_slots" + "." + str(day)
+    cursor = db[teacher_collection].find({q_string: str(slot_to_check)}, {"_id": 0, "name": "true", "uid": "true"})
+    free_teachers_for_slot = []
+    # making a list of dictionaries available teachers and their respective uid for a slot on a day
+    for value in cursor:
+        free_teachers_for_slot.append({value["name"]: value["uid"]})
+
+    print(free_teachers_for_slot)
+    return free_teachers_for_slot
+
+
+"""Argument to below function should be of type 
 value = [{"21136": ["System Programming", "Programming Lab-2"]},
          {"21135": ["CBOT", "Programming Lab-3"]}]
 """
@@ -45,4 +72,10 @@ def update_subjects_of_teachers(list_of_dictionaries):
                                                        {"$set": {"subjects": values}})
 
 
+"""Examples of above functions"""
 # update_subjects_of_teachers(value)
+# name, uid, slots = fetch_empty_slots("MCA")
+# print(name)
+# print(uid)
+# print(slots)
+# free_teachers_for _slot = random("Tuesday", 4)
