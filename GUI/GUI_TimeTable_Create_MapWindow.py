@@ -7,7 +7,9 @@ class MapWindow:
         # dependencies
         self.teachers = ["None", "Shared", "Manoj Kumar", "Narendra Kumar", "Santosh Kumar Dwivedi", "Vipin Saxena", "Deepa Raj", "Shalini Chandra"]
         self.teacher_combo_boxes = []                       # multiple comboBoxes are required to show dropDowns for each teacher
+        self.testVariable = None
         self.subjectList = None
+        self.windowOpened = False
 
         # main widget containing dynamic contents
         self.mapSubWindow = QWidget(parent)
@@ -42,11 +44,21 @@ class MapWindow:
         self.mapSubWindow.setLayout(self.mappingSection)
 
     def display_sharing_section(self, index):
+        # getting current value of selected combo box
         value = self.teacher_combo_boxes[index].currentText()
-
         if value == 'Shared':
             # showing vertical line (to separate 2 sub windows)
             self.VLine.show()
+
+            self.windowOpened = True                                            # to indicate that sharing window is open now
+
+            # getting index of the operated combo box
+            self.testVariable = index
+            print(self.testVariable)
+
+            # disabling all the combo boxes till the sharing option window is open
+            for i in range(len(self.teacher_combo_boxes)):
+                self.disable_combo_box(i)
 
             # to generate the list for teachers which would be sharing a subject
             prompt = QLabel(f'Subject {self.subjectList[index]} will be shared by')
@@ -80,7 +92,7 @@ class MapWindow:
 
     def create_combo_box(self, for_index):
         teacher_options_widget = QComboBox()
-        teacher_options_widget.addItems(self.teachers)             # same list of teacher is added as each comboBox items
+        teacher_options_widget.addItems(self.teachers)                      # same list of teacher is added as each comboBox items
         teacher_options_widget.currentIndexChanged.connect(lambda: self.display_sharing_section(for_index))
         return teacher_options_widget
 
@@ -121,6 +133,14 @@ class MapWindow:
         self.mapSubWindow.close()
 
     def close_sharing_section(self):
+        # setting 'None' in lieu of 'Shared' if cancel button is pressed
+        if self.windowOpened is True:
+            self.teacher_combo_boxes[self.testVariable].setCurrentIndex(0)
+
+            # enabling all the disabled drop-downs)
+            for i in range(len(self.teacher_combo_boxes)):
+                self.enable_combo_box(i)
+
         # external code to empty the (dynamic layout)
         self.VLine.hide()
 
@@ -144,5 +164,12 @@ class MapWindow:
             if widget:
                 widget.close()
 
-    def disable_combo_boxes(self):
-        pass
+        self.windowOpened = False
+
+    # for disabling all the drop-downs (for selecting teacher) till sharing window is open
+    def disable_combo_box(self, at_index):
+        self.teacher_combo_boxes[at_index].setEnabled(False)
+
+    # for enabling all the drop-downs (which were disable due to opening of sharing window)
+    def enable_combo_box(self, at_index):
+        self.teacher_combo_boxes[at_index].setEnabled(True)
