@@ -19,7 +19,7 @@ class AddingFunctionality(QWidget):
                                       "font-size: 10pt")
         add = QPushButton("ADD",self)
         add.move(200,350)
-        add.clicked.connect(self.addt)
+        add.clicked.connect(self.add_teacher)
 
         # namefield
 
@@ -38,14 +38,6 @@ class AddingFunctionality(QWidget):
         self.teacher_options.addItems(self.department)
         self.teacher_options.move(250,110)
         self.teacher_options.setFixedWidth(200)
-
-        # uid
-        uidField = QLabel("UID", self)
-        uidField.move(70, 150)
-        self.TextuidField = QLineEdit(self)
-        self.TextuidField.move(250, 150)
-        self.TextuidField.setFixedWidth(200)
-        self.TextuidField.setFixedHeight(30)
 
         # Designation
         nameField = QLabel("DESIGNATION", self)
@@ -72,15 +64,14 @@ class AddingFunctionality(QWidget):
         self.TextminLectures.setFixedWidth(200)
         self.TextminLectures.setFixedHeight(30)
 
-    def addt(self):
+    def add_teacher(self):
         name = self.nameField.text()
-        uid = self.TextuidField.text()
         department = self.teacher_options.currentText()
         designation = self.teacher_designation.currentIndex() + 1
         min_lect = self.TextminLectures.text()
         max_lect = self.TextmaxLectures.text()
 
-        teacher = Teacher(name, department, designation, None, uid, max_lect, min_lect)
+        teacher = Teacher(name, department, designation, max_lect, min_lect)
         teacher.add_teacher()
 
         self.nameField.clear()

@@ -9,16 +9,16 @@ import Detached.Global.Variables.varFile1 as Var
 
 # Teacher Data Structure Definition
 class Teacher:
-    def __init__(self, name=None, dept=None, rank=None, school=None, course=None, uid=None, max_lec=None, min_lec=None,
+    def __init__(self, name=None, dept=None, rank=None, max_lec=None, min_lec=None, school=None, course=None, uid=None,
                  sem_taught=None):
         self.name = name
         self.department = dept
         self.rank = rank
         self.school = school
-        self.course = course   # added for new teachers
-        self.uID = uid  # String
-        self.maxLectures = max_lec  # per week
-        self.minLectures = min_lec  # per week
+        self.course = course                            # added for new teachers
+        self.uID = uid                                  # String
+        self.maxLectures = max_lec                      # per week
+        self.minLectures = min_lec                      # per week
         self.lectureSlots = [[False] * Var.maximumSlots] * Var.totalWorkingDays
         self.semestersTeaching = sem_taught
         self.subjects = []  # self.add_subjects_for_teachers()
@@ -39,6 +39,7 @@ class Teacher:
             print(semester)
         print()
 
+    # function to set maximum number of lectures that could be taken per week by a teacher
     def set_max_lectures(self, max_lectures):
         if max_lectures < self.minLectures:
             print("Cannot be less than minimum lectures")
@@ -49,6 +50,10 @@ class Teacher:
         pass
 
     def add_teacher(self):
+        # getting id for the teacher
+        self.uID = self.generate_id()
+
+        # creating a JS formatted document to insert it into the teacher's database
         document = {"name": self.name, "department": self.department, "school": self.school, "course": self.course,
                     "uid": self.uID,
                     "rank": self.rank, "max_l": self.maxLectures, "min_l": self.minLectures,
@@ -57,8 +62,16 @@ class Teacher:
                     "empty_slots": [{day: list(str(x) for x in range(1, 7))} for day in Var.days_list]
                     }
 
+        # insertion of all information (as a document) into the database
         db[teacher_collection].insert(document)
         print("data inserted")
+
+    # function to create an ID for a new teacher
+    def generate_id(self):
+        string_for_id = self.rank[0:4]                  # fetching the 1st 3 characters of teacher's designation
+        whole_id = string_for_id + str(Var.id_number)   # appending a number into the above sliced string
+        Var.id_number += 1                              # ##### must be updated in database #######
+        return whole_id                                 # is a string.
 
 
 # you can as many subjects as needed
