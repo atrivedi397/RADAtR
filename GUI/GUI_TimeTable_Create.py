@@ -91,7 +91,7 @@ class TimeTableWindow:
         self.fourSections.addLayout(self.fourthSection)
         self.fourSections.setContentsMargins(40, 10, 20, 10)
 
-        self.createTimeTableWindow.setLayout(self.fourSections)
+        # self.createTimeTableWindow.setLayout(self.fourSections)
 
     # shows the subject and teacher list only if it's not already created or regenerates it
     def test_function(self):
@@ -102,6 +102,7 @@ class TimeTableWindow:
         else:
             self.empty_third_section()
             self.generate_list()
+            self.mapSubWinClass.close_sharing_section()
             self.mapSubWinClass.mapSubWindow.show()
 
     # generate list of subjects and teachers to map

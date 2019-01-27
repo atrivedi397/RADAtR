@@ -5,9 +5,9 @@ from Detached.Global.Functions.IndependentFunctions import get_list_of_subject_f
 class MapWindow:
     def __init__(self, parent=None):
         # dependencies
-        self.teachers = ["None", "Shared", "Manoj Kumar", "Narendra Kumar", "Santosh Kumar Dwivedi", "Vipin Saxena", "Deepa Raj", "Shalini Chandra"]
+        self.teachers = ["None", "Shared", "Manoj Kumar", "Narendra Kumar", "Sanjay Kumar Dwivedi", "Vipin Saxena", "Deepa Raj", "Shalini Chandra"]
         self.teacher_combo_boxes = []                       # multiple comboBoxes are required to show dropDowns for each teacher
-        self.testVariable = None
+        self.callingComboBoxIndex = None
         self.subjectList = None
         self.windowOpened = False
 
@@ -41,7 +41,7 @@ class MapWindow:
         self.mappingSection.addWidget(self.VLine)
         self.mappingSection.addLayout(self.sharedMapArea)
 
-        self.mapSubWindow.setLayout(self.mappingSection)
+        # self.mapSubWindow.setLayout(self.mappingSection)
 
     def display_sharing_section(self, index):
         # getting current value of selected combo box
@@ -53,8 +53,7 @@ class MapWindow:
             self.windowOpened = True                                            # to indicate that sharing window is open now
 
             # getting index of the operated combo box
-            self.testVariable = index
-            print(self.testVariable)
+            self.callingComboBoxIndex = index
 
             # disabling all the combo boxes till the sharing option window is open
             for i in range(len(self.teacher_combo_boxes)):
@@ -83,11 +82,12 @@ class MapWindow:
 
             # for 'share' and 'cancel' buttons layout
             self.shareButtonsLayout.addStretch(1)
-            self.shareButtonsLayout.addWidget(QPushButton('Share'))         # must be referenced to set other behaviour
+            share_teacher_button = QPushButton('Share')
+            self.shareButtonsLayout.addWidget(share_teacher_button)         # must be referenced to set other behaviour
 
             cancel_share_button = QPushButton('Cancel')
             cancel_share_button.clicked.connect(self.close_sharing_section)
-            self.shareButtonsLayout.addWidget(cancel_share_button)          # must be referenced to set other behaviour
+            self.shareButtonsLayout.addWidget(cancel_share_button)
             self.sharingTeacherLayout.addLayout(self.shareButtonsLayout)
 
     def create_combo_box(self, for_index):
@@ -135,7 +135,7 @@ class MapWindow:
     def close_sharing_section(self):
         # setting 'None' in lieu of 'Shared' if cancel button is pressed
         if self.windowOpened is True:
-            self.teacher_combo_boxes[self.testVariable].setCurrentIndex(0)
+            self.teacher_combo_boxes[self.callingComboBoxIndex].setCurrentIndex(0)
 
             # enabling all the disabled drop-downs)
             for i in range(len(self.teacher_combo_boxes)):
