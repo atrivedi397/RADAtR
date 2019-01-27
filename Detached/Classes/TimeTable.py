@@ -33,11 +33,15 @@ class TimeTable:
         pass
 
 
+# this function must be modified as it's definition isn't the supposed definition.
+# this function is supposed to be called before subject-teacher mapping and
+# its aim to find the no. of free slots of a teacher for teaching a subject per week.
 def fetch_empty_slots(course):
     empty_slots = db[teacher_collection].find({"course": str(course)},
                                               {"_id": 0, "empty_slots": "true",
                                                "name": "true", "uid": "true"})
 
+    # this isn't required as per its objective
     names, uid, slots = [], [], []
     for value in empty_slots:
         names.append(value["name"])
@@ -47,7 +51,8 @@ def fetch_empty_slots(course):
     return names, uid, slots
 
 
-def random(day, slot_to_check):
+# called after subject-teacher mapping. It checks the availability of a teacher for a given day and slot(s)
+def get_teacher_availability_for_a_slot(day, slot_to_check):
     q_string = "empty_slots" + "." + str(day)
     cursor = db[teacher_collection].find({q_string: str(slot_to_check)}, {"_id": 0, "name": "true", "uid": "true"})
     free_teachers_for_slot = []
@@ -59,23 +64,9 @@ def random(day, slot_to_check):
     return free_teachers_for_slot
 
 
-"""Argument to below function should be of type 
-value = [{"21136": ["System Programming", "Programming Lab-2"]},
-         {"21135": ["CBOT", "Programming Lab-3"]}]
-"""
-
-
+# assign the teacher(s) about their subjects in different semesters
 def update_subjects_of_teachers(list_of_dictionaries):
     for index in range(len(list_of_dictionaries)):
         for key, values in list_of_dictionaries[index].items():
             db[teacher_collection].find_one_and_update({"uid": str(key)},
                                                        {"$set": {"subjects": values}})
-
-
-"""Examples of above functions"""
-# update_subjects_of_teachers(value)
-# name, uid, slots = fetch_empty_slots("MCA")
-# print(name)
-# print(uid)
-# print(slots)
-# free_teachers_for _slot = random("Tuesday", 4)

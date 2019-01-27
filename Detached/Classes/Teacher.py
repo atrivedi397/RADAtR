@@ -68,10 +68,3 @@ def update_teacher_subject(teacher_uid, course, semester, *subjects):
     print(cursor)
     db[teacher_collection].find_one_and_update({"uid": teacher_uid},
                                                {"$set": {key: subjects}})
-
-
-# Example
-update_teacher_subject("21130", "MCA", "5", "Artificial Intelligence", "Programming Lab-5")
-update_teacher_subject("21130", "MCA", "2", "Compiler Design", "Programming Lab-2")
-update_teacher_subject("21130", "MCA", "3", "Operating Systems", "Programming Lab-3")
-print("done")

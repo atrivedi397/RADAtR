@@ -43,6 +43,7 @@ class MapWindow:
 
         # self.mapSubWindow.setLayout(self.mappingSection)
 
+    # function to display all teacher names that will share the same subject
     def display_sharing_section(self, index):
         # getting current value of selected combo box
         value = self.teacher_combo_boxes[index].currentText()
@@ -83,6 +84,7 @@ class MapWindow:
             # for 'share' and 'cancel' buttons layout
             self.shareButtonsLayout.addStretch(1)
             share_teacher_button = QPushButton('Share')
+            share_teacher_button.clicked.connect(self.share_subject_with)
             self.shareButtonsLayout.addWidget(share_teacher_button)         # must be referenced to set other behaviour
 
             cancel_share_button = QPushButton('Cancel')
@@ -90,6 +92,7 @@ class MapWindow:
             self.shareButtonsLayout.addWidget(cancel_share_button)
             self.sharingTeacherLayout.addLayout(self.shareButtonsLayout)
 
+    # helper function for 'mapping_options()'
     def create_combo_box(self, for_index):
         teacher_options_widget = QComboBox()
         teacher_options_widget.addItems(self.teachers)                      # same list of teacher is added as each comboBox items
@@ -173,3 +176,7 @@ class MapWindow:
     # for enabling all the drop-downs (which were disable due to opening of sharing window)
     def enable_combo_box(self, at_index):
         self.teacher_combo_boxes[at_index].setEnabled(True)
+
+    # for storing the (only) shared mappings
+    def share_subject_with(self):
+        pass
