@@ -1,13 +1,8 @@
 import json
-from pymongo import MongoClient
-from Detached.Global.Variables.varDB import *
-
-"""This function should be called for creating a subject list for a new course."""
-
-client = MongoClient(localhost)
-db = client[database]
+from Detached.Global.Configurations.ConnectionEstablishment import *
 
 
+# This function should be called for creating a subject list for a new course.
 def insert_course_and_subjects():
     course_name = input("Type the course name")
     total_semesters = int(input("Provide total semesters"))
@@ -53,6 +48,12 @@ def insert_all():
     print(db[collection].find())
 
 
-# Function Called For Testing
+# function to get subjects list of a given course and respective semester
+def get_list_of_subject_for(course, semester):
+    sub_list = []
+    course_sem = str(str(course) + "." + str(semester))
+    cursor = db[collection].find_one({course: {"$exists": "true"}}, {course_sem: "true", "_id": 0})
+    for subject in cursor[str(course)][str(semester)]:
+        sub_list.append(subject)
+    return sub_list
 
-update_subject("MCA", 5, "Elective Paper-3", "Parallel Computing")

@@ -1,0 +1,88 @@
+[
+  {
+    "name": "Manoj Kumar",
+    "department": "DCS",
+    "school": "None",
+    "uid": "21131",
+    "rank": "3",
+    "max_l": "17",
+    "min_l": "13",
+    "semester_teaching": [{"DCS": {"MCA": ["1", "2", "5"]}}],
+    "subjects": [],
+
+    "empty_slots": [{"Monday": ["1","2","3","4","5","6"]},
+                    {"Tuesday": ["1","2","3","4","5","6"]},
+                    {"Wednesday": ["1","2","3","4","5","6"]},
+                    {"Thursday":  ["1","2","3","4","5","6"]},
+                    {"Friday":  ["1","2","3","4","5","6"]}]
+  },
+
+  {
+    "name": "Narendra Kumar",
+    "department": "DCS",
+    "school": "None",
+    "uid": "21132",
+    "rank": "3",
+    "max_l": "17",
+    "min_l": "13",
+    "semester_teaching": [{"DCS": {"MCA": ["1", "5", "6"]}}],
+    "subjects": [],
+    "empty_slots": [{"Monday": ["1","2","3","4","5","6"]},
+                    {"Tuesday": ["1","2","3","4","5","6"]},
+                    {"Wednesday": ["1","2","3","4","5","6"]},
+                    {"Thursday":  ["1","2","3","4","5","6"]},
+                    {"Friday":  ["1","2","3","4","5","6"]}]
+  },
+
+  {
+    "name": "Vipin Saxena",
+    "department": "DCS",
+    "school": "None",
+    "uid": "21133",
+    "rank": "2",
+    "max_l": "17",
+    "min_l": "13",
+    "current_l": "0",
+    "semester_teaching": [{"DCS": {"MCA": ["1", "2", "4", "5"]}}],
+    "subjects": [],
+    "empty_slots": [{"Monday": ["1","2","3","4","5","6"]},
+                    {"Tuesday": ["1","2","3","4","5","6"]},
+                    {"Wednesday": ["1","2","3","4","5","6"]},
+                    {"Thursday":  ["1","2","3","4","5","6"]},
+                    {"Friday":  ["1","2","3","4","5","6"]}]
+  },
+
+  {
+    "name": "Deepa Raj",
+    "department": "DCS",
+    "school": "None",
+    "uid": "21134",
+    "rank": "3",
+    "max_l": "17",
+    "min_l": "13",
+    "semester_teaching": [{"DCS": {"MCA": ["1", "2", "3"]}}],
+    "subjects": [],
+    "empty_slots": [{"Monday": ["1","2","3","4","5","6"]},
+                    {"Tuesday": ["1","2","3","4","5","6"]},
+                    {"Wednesday": ["1","2","3","4","5","6"]},
+                    {"Thursday":  ["1","2","3","4","5","6"]},
+                    {"Friday":  ["1","2","3","4","5","6"]}]
+  },
+
+  {
+    "name": "Shalini Chandra",
+    "department": "DCS",
+    "school": "None",
+    "uid": "21135",
+    "rank": "3",
+    "max_l": "17",
+    "min_l": "13",
+    "semester_teaching": [{"DCS": {"MCA": ["3", "4", "5"]}}],
+    "subjects": [],
+    "empty_slots": [{"Monday": ["1","2","3","4","5","6"]},
+                    {"Tuesday": ["1","2","3","4","5","6"]},
+                    {"Wednesday": ["1","2","3","4","5","6"]},
+                    {"Thursday":  ["1","2","3","4","5","6"]},
+                    {"Friday":  ["1","2","3","4","5","6"]}]
+  }
+]

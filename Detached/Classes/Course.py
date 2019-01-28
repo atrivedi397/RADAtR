@@ -1,5 +1,9 @@
-from Detached.Classes.Teacher import Teacher
-from Detached.Classes.Teacher import check_teacher_availability
+from Detached.Global.Functions.TeacherManagement import check_teacher_availability
+from Detached.Global.Variables.varDB import *
+from pymongo import MongoClient
+
+client = MongoClient(localhost)
+db = client[database]
 
 
 # Course Data Structure definition
@@ -9,8 +13,6 @@ class Course:
         self.code = code
         self.batch = batch
         self.totalSemesters = sem
-        self.subjects = []
-        self.totalSubjects = len(self.subjects)  # so that if subject is added or removed, no need to update explicitly
         self.startingHour = start_time  # 24 Hrs.
         self.teachers = []  # append teacher's uID
 
@@ -20,10 +22,6 @@ class Course:
         print(f"Code: {self.code}")
         print(f"Start Timing: {self.startingHour} hours")
         print(f"No. of Semesters: {self.totalSemesters}")
-        print(f"No. of Subjects: {self.totalSubjects}")
-        print(f"Subjects:")
-        for subject in self.subjects:
-            print(subject)
         print(f"Teachers:")
         for teacher in self.teachers:
             print(teacher)
@@ -45,10 +43,6 @@ class Course:
         else:
             return
 
-    # To be completed
-    def add_subject(self, subjects_from_subject_data_structure):
-        self.subjects.append(subjects_from_subject_data_structure)
-
     # Done
     def add_teacher(self, teacher_uid):
         if check_teacher_availability(teacher_uid):
@@ -66,12 +60,25 @@ class Course:
 
 
 # Test:
-obj = Teacher("Manoj", "DCS", 3, "SIST", "mca-mk", 17, 13, 15)
-obj.getinfo()
-print(check_teacher_availability(obj))
-course1 = Course("MCA", "mca", 2, 2, 10)
-course1.getinfo()
-course1.add_teacher(obj)
-course1.getinfo()
-course1.remove_teacher("mca-mk")
-course1.getinfo()
+# obj = Teacher("Manoj", "DCS", 3, "SIST", "mca-mk", 17, 13, 15)
+# obj.getinfo()
+# print(check_teacher_availability(obj))
+# course1 = Course("MCA", "mca", 2, 2, 10)
+# course1.getinfo()
+# course1.add_teacher(obj)
+# course1.getinfo()
+# course1.remove_teacher("mca-mk")
+# course1.getinfo()
+
+def get_list_of_subject_for(course, semester):
+    sub_list = []
+    course_sem = str(str(course) + "." + str(semester))
+    cursor = db[collection].find_one({course: {"$exists": "true"}}, {course_sem: "true", "_id": 0})
+    print(cursor)
+    for subject in cursor[str(course)][str(semester)]:
+        sub_list.append(subject)
+    print(sub_list)
+    return sub_list
+
+
+get_list_of_subject_for("MCA", 3)
