@@ -67,7 +67,7 @@ class AddingFunctionality(QWidget):
     def add_teacher(self):
         name = self.nameField.text()
         department = self.teacher_options.currentText()
-        designation = self.teacher_designation.currentIndex() + 1
+        designation = self.teacher_designation.currentText()
         min_lect = self.TextminLectures.text()
         max_lect = self.TextmaxLectures.text()
 
@@ -75,10 +75,8 @@ class AddingFunctionality(QWidget):
         teacher.add_teacher()
 
         self.nameField.clear()
-        self.TextuidField.clear()
         self.teacher_options.setCurrentIndex(0)
         self.teacher_designation.setCurrentIndex(0)
-        self.TextuidField.clear()
         self.TextminLectures.clear()
         self.TextmaxLectures.clear()
 
