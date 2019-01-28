@@ -10,3 +10,4 @@ cloud_host3 = "localhost:27017"     # mongodb server3
 database = "University"
 collection = "Subjects"
 teacher_collection = "Teachers"
+configuration = "Configuration"

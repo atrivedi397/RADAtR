@@ -69,8 +69,20 @@ class Teacher:
     # function to create an ID for a new teacher
     def generate_id(self):
         string_for_id = self.rank[0:4]                  # fetching the 1st 3 characters of teacher's designation
-        whole_id = string_for_id + str(Var.id_number)   # appending a number into the above sliced string
+        cursor = db[configuration].find_one({}, {"_id": 0, "id_number": "true"})
+        id_number = None
+        if cursor is not None:
+            for value in cursor["id_number"]:
+                id_number = value
+        else:
+            db[configuration].insert(Var.db_variables)
+            cursor = db[configuration].find_one({}, {"_id": 0, "id_number": "true"})
+            for value in cursor["id_number"]:
+                id_number = value
+
+        whole_id = string_for_id + str(id_number)   # appending a number into the above sliced string
         Var.id_number += 1                              # ##### must be updated in database #######
+        db[configuration].find_one_and_update({}, {"$set": {"id_number": str(Var.id_number)}})
         return whole_id                                 # is a string.
 
 
