@@ -2,6 +2,18 @@
 totalWorkingDays = 5
 maximumSlots = 6        # maximum possibility of total lectures in a day
 days_list = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"]
+starting_time = 1000
+duration = 100    # in hrs
+time_slot = ["1000"]
+
+for i in range(maximumSlots):
+    list_content = starting_time + duration
+    starting_time = list_content
+    #print (list_content)
+    convert_to_str = str(list_content)
+    time_slot.append(convert_to_str)
+print (time_slot)
+
 
 
 # -------- teacher oriented variables --------------
