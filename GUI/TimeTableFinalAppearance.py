@@ -12,7 +12,7 @@ class Timetable(QWidget):
 
     def MainWindowProp(self):
         self.setWindowTitle(self.title)
-        self.setGeometry(300,300,800,300)
+        self.setGeometry(300, 300, 800, 300)
 
         self.createTable()
 
@@ -22,14 +22,17 @@ class Timetable(QWidget):
         self.setLayout(self.layout)
 
     def createTable(self):
-       # Create table
+        # Create table
         self.tableWidget = QTableWidget()
         self.tableWidget.setRowCount(totalWorkingDays)
         self.tableWidget.setColumnCount(maximumSlots)
-        self.tableWidget.move(0,0)
+        self.tableWidget.move(0, 0)
         self.tableWidget.setVerticalHeaderLabels(days_list)
         self.tableWidget.setHorizontalHeaderLabels(time_slot)
 
+        self.tableWidget.setItem(0, 0, QTableWidgetItem())
+        self.tableWidget.setItem(0, 1, QTableWidgetItem())
+        self.tableWidget.setItem(0, 2, QTableWidgetItem())
 
 
 def main():
@@ -42,4 +45,3 @@ def main():
 
 if __name__ == '__main__':
     main()
-
