@@ -39,6 +39,14 @@ class AddingFunctionality(QWidget):
         self.teacher_options.move(250,110)
         self.teacher_options.setFixedWidth(200)
 
+        # COURSE
+        self.courseLabel = QLabel("COURSE",self)
+        self.courseLabel.move(70,150)
+        self.courseField = QLineEdit(self)
+        self.courseField.move(250,150)
+        self.courseField.setFixedWidth(200)
+        self.courseField.setFixedHeight(30)
+
         # Designation
         nameField = QLabel("DESIGNATION", self)
         nameField.move(70, 190)
