@@ -41,7 +41,7 @@ def update_subject(course, sem, replacing, replaced_by):
 
 def insert_all():
     # give absolute address of the records.json file to load at once
-    with open('/home/atrivedi/RADAtR/Detached/Database/records.json') as f:
+    with open('/home/dev/Documents/PycharmProjects/RADAtR/Detached/Database/records.json') as f:
         file_data = json.load(f)
 
     db[collection].insert(file_data)

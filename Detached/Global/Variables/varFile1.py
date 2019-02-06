@@ -13,6 +13,7 @@ for i in range(maximumSlots):
     convert_to_str = str(list_content)
     time_slot.append(convert_to_str)
 print(time_slot)
+
 dictionary_of_teachers = [
     {'DR. SHALINI CHANDRA': ['Object Oriented Programming & C++', 'Internet and Java Programming', 'Programming Lab-3']},
     {'DR. NARENDRA KUMAR': ['Computer Architecture', 'Elective Paper-1']},
@@ -23,7 +24,7 @@ dictionary_of_teachers = [
     {'PROFF. VIPIN SAXENA': ['Software Engineering']}]
 
 for i in dictionary_of_teachers:
-    for j,k in i:
+    for j, k in i.items():
         print(j)
 
 # print(dictionary_of_teachers)
