@@ -1,6 +1,13 @@
 import json
 from Detached.Global.Configurations.ConnectionEstablishment import *
 
+"""File which consist of user dependent configurations. These probably be different for each user.
+   Hence, if this file doesn't exists, create manually at following location (within the project):
+   Detached/Global/Configurations/LocalUsersConfigurations.py
+   
+   Note that this file is not supposed to be on tracking."""
+from Detached.Global.Configurations.LocalUsersConfigurations import *
+
 
 # This function should be called for creating a subject list for a new course.
 def insert_course_and_subjects():
@@ -39,9 +46,14 @@ def update_subject(course, sem, replacing, replaced_by):
     db[collection].find_one_and_update({course_sem: replacing}, {"$set": {to_be_changed: replaced_by}})
 
 
+# give absolute address of the records.json file to load at once
 def insert_all():
-    # give absolute address of the records.json file to load at once
-    with open('/home/dev/Documents/PycharmProjects/RADAtR/Detached/Database/records.json') as f:
+    # location (within the project) of the file to be loaded
+    file_location = 'Detached/Database/records.json'
+
+    # address (from the root location) of file
+    complete_location = project_location + file_location
+    with open(complete_location) as f:
         file_data = json.load(f)
 
     db[collection].insert(file_data)
@@ -56,4 +68,3 @@ def get_list_of_subject_for(course, semester):
     for subject in cursor[str(course)][str(semester)]:
         sub_list.append(subject)
     return sub_list
-
