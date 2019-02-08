@@ -50,10 +50,15 @@ class MapWindow:
         # self.mapSubWindow.setLayout(self.mappingSection)
 
     # function to display all teacher names that will share the same subject
-    def display_sharing_section(self, index):
+    def process_combobox(self, index):
         # getting current value of selected combo box
         value = self.teacher_combo_boxes[index].currentText()
-        if value == 'Shared':
+        index_of_teacher = self.teacher_combo_boxes[index].currentIndex()
+
+        if value == 'None':
+            pass
+
+        elif value == 'Shared':
             # showing vertical line (to separate 2 sub windows)
             self.VLine.show()
 
@@ -99,11 +104,47 @@ class MapWindow:
             self.shareButtonsLayout.addWidget(cancel_share_button)
             self.sharingTeacherLayout.addLayout(self.shareButtonsLayout)
 
+        else:
+            # getting values
+            teacher_name = self.teachers[index_of_teacher]
+            subject_name = self.subjectList[index]
+
+            found_teacher_match = False
+            new_mapping_added = False
+            mapping = {teacher_name: [subject_name]}                        # creating mapping in form of dictionary
+
+            if len(self.finalList) == 0:                                    # when no 1 to 1 mapping is made
+                self.finalList.append(mapping)                              # appending the mapping into final list
+                print('first mapping...')
+
+            else:                                                           # if some 1 to 1 mapping exists already
+                for each_mapping in self.finalList:
+                    for key, value in each_mapping.items():
+                        # if subject_name == value:
+                        #     print('mapping must be renewed')
+
+                        if teacher_name == key:                           # if teacher is already teaching a subject
+                            print('updating mapping...')
+                            each_mapping[key].append(subject_name)          # append another subject
+                            found_teacher_match = True
+
+                    if found_teacher_match:
+                        break                                               # stop looking for teacher in finalList
+
+                if not found_teacher_match:
+                    print('adding new mapping')
+                    self.finalList.append(mapping)                          # add a new mapping in finalList
+
+            # test output
+            for i in self.finalList:
+                print(i)
+            print()
+
     # helper function for 'mapping_options()'
     def create_combo_box(self, for_index):
         teacher_options_widget = QComboBox()
         teacher_options_widget.addItems(self.teachers)            # same list of teacher is added as each comboBox items
-        teacher_options_widget.currentIndexChanged.connect(lambda: self.display_sharing_section(for_index))
+        teacher_options_widget.currentIndexChanged.connect(lambda: self.process_combobox(for_index))
         return teacher_options_widget
 
     def mapping_options(self, for_semester):
