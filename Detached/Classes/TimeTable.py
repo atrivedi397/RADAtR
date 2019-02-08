@@ -1,4 +1,6 @@
-from Detached.Global.Variables.varFile1 import maximumSlots
+import random
+
+from Detached.Global.Variables.varFile1 import *
 from Detached.Global.Configurations.ConnectionEstablishment import *
 
 
@@ -22,17 +24,52 @@ class TimeTable:
         pass
 
     def place(self, teacher_to_place):
-        """This will select the 'freeSlots' of a teacher at a time. After that it will iterate on 'freeLectures' to place or
-           update its(freeLecture) value. Once 'freeLecture' gets updated, another teacher will get selected. The procedure goes on
-           until either all the subjects have enough lectures or teacher maximum lecture value is reached. Which teacher to select
-           could either be in sequence or could be random"""
-        pass
+        while True:
+            time_table = [[None for _ in range(len(days_list))] for _ in range(maximumSlots)]
+            for index in range(len(time_table)):
+                for day in range(len(time_table[index])):
+                    for slot in range(maximumSlots):
+                        time_table[slot][day] = self.random(teacher_to_place)
 
-    def random(self):
-        # picks teachers randomly
-        pass
+            for value in time_table:
+                print(value)
+
+            db[time_table_collection].insert({"course": "MCA",
+                                              "semester": "1",
+                                              "previous_one": time_table})
+
+            value = int(input("\nAre you satisfied?\n1. Yes\n0.No\n"))
+            if value:
+                for index in range(len(time_table)):
+                    for i in range(len(time_table[index])):
+                        query = "empty_slots" + ".$[]." + str(days_list[i])
+                        slot_no = str(index + 1)
+
+                        db[teacher_collection].find_one_and_update({"uid": str(time_table[index][i])},
+                                                                   {"$pull": {query: slot_no}})
+                db[time_table_collection].find_one_and_update({"course": "MCA", "semester": "1"},
+                                                              {"$set": {"latest": time_table}})
+                break
+
+            else:
+                continue
+
+        _, uid, empty = fetch_empty_slots("MCA")
+        print(empty)
+        print(uid)
+
+    def random(self, list_of_teachers):
+        global choice_taken
+        while True:
+            choice = random.choice(list_of_teachers)
+            if choice != choice_taken:
+                choice_taken = choice
+                return choice
+            else:
+                continue
 
 
+choice_taken = None
 # this function must be modified as it's definition isn't the supposed definition.
 # this function is supposed to be called before subject-teacher mapping and
 # its aim to find the no. of free slots of a teacher for teaching a subject per week.
@@ -70,3 +107,8 @@ def update_subjects_of_teachers(list_of_dictionaries):
         for key, values in list_of_dictionaries[index].items():
             db[teacher_collection].find_one_and_update({"uid": str(key)},
                                                        {"$set": {"subjects": values}})
+
+
+obj = TimeTable()
+val0, val, val2 = fetch_empty_slots("MCA")
+obj.place(val0)
