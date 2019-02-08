@@ -11,9 +11,6 @@ class TimeTableWindow:
         # This is the 'Create' Window
         self.createTimeTableWindow = QWidget(base)
 
-        # creating class which is used in showing the mapping options
-        self.mapSubWinClass = MapWindow(self.createTimeTableWindow)
-
         # text widgets for the window
         self.windowHeading = QLabel('Create Time Table')               # window Heading Text
         self.windowHeading.setStyleSheet('font-size: 16px;'
@@ -31,8 +28,13 @@ class TimeTableWindow:
         self.timingField = QLineEdit()                                  # for timing input (24 hours)
         self.timingField.setFixedWidth(80)
         self.generateButton = QPushButton('Generate')                   # creating 'Generate' button
+        self.generateButton.setEnabled(False)
+        self.generateButton.clicked.connect(self.process_generate_button)
         self.cancelButton = QPushButton('Cancel')                       # creating 'Cancel' button
         self.cancelButton.clicked.connect(self.close_create_window)
+
+        # creating class which is used in showing the mapping options
+        self.mapSubWinClass = MapWindow(self.createTimeTableWindow, self.generateButton)
 
         # creating a horizontal line 1 (for being below the semester, batch, timings inputs)
         self.HLine = QFrame(self.createTimeTableWindow)
@@ -111,7 +113,7 @@ class TimeTableWindow:
         self.HLine.show()
         self.thirdSection.addWidget(self.mapSubWinClass.mapSubWindow)   # displaying mapping options in 3rd Section
         self.thirdSection.addStretch(2)                                 # so that the remaining space is at bottom only
-        self.mapSubWinClass.mapping_options(self.semesterField.currentIndex())
+        self.mapSubWinClass.display_mapping_options(self.semesterField.currentIndex())
         self.alreadyCreated = True
 
     # to clear the subject-teacher mapping list for either new list or for closing it
@@ -127,6 +129,10 @@ class TimeTableWindow:
             widget = item.widget()
             if widget:
                 widget.close()
+
+    # function called on click of 'Generate' button
+    def process_generate_button(self):
+        self.mapSubWinClass.generate_time_table()
 
     # to close entire 'create Time Table' window
     def close_create_window(self):

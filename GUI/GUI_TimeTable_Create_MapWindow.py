@@ -3,8 +3,9 @@ from Detached.Global.Functions.IndependentFunctions import get_list_of_subject_f
 
 
 class MapWindow:
-    def __init__(self, parent=None):
+    def __init__(self, parent=None, widget=None):
         # dependencies
+        self.generateButton = widget               # refers to the 'Generate' button which is located in parent widget
         self.teachers = ["None", "Shared", "Manoj Kumar", "Narendra Kumar", "Sanjay Kumar Dwivedi", "Vipin Saxena", "Deepa Raj", "Shalini Chandra"]
         self.teacher_combo_boxes = []              # multiple comboBoxes are required to show dropDowns for each subject
         self.callingComboBoxIndex = None           # to identify which combo Box sent the signal or assigned a value
@@ -111,16 +112,23 @@ class MapWindow:
             subject_name = self.subjectList[index]
 
             # generating single mappings and updating finalList
-            self.single_map(teacher_name, subject_name, index)
+            self.teacher_to_subjects_map(teacher_name, subject_name, index)
 
-    # helper function for 'mapping_options()'
+        # enable 'Generate' button only when total mappings are equals to number of subjects
+        total_mappings = len(self.mapped_subjects_index)
+        if total_mappings == len(self.subjectList):
+            self.generateButton.setEnabled(True)
+        else:
+            self.generateButton.setEnabled(False)
+
+    # helper function for 'display_mapping_options()'
     def create_combo_box(self, for_index):
         teacher_options_widget = QComboBox()
         teacher_options_widget.addItems(self.teachers)            # same list of teacher is added as each comboBox items
         teacher_options_widget.currentIndexChanged.connect(lambda: self.process_combobox(for_index))
         return teacher_options_widget
 
-    def mapping_options(self, for_semester):
+    def display_mapping_options(self, for_semester):
         prompt = QLabel('Please assign the following subjects with their respective lecturer')
         prompt.setContentsMargins(0, 0, 0, 20)
         self.mapArea.addWidget(prompt)
@@ -138,8 +146,6 @@ class MapWindow:
             self.teacher_combo_boxes.append(drop_down)
             self.mapArea.addWidget(QLabel(self.subjectList[i]))
             self.mapArea.addWidget(self.teacher_combo_boxes[i])
-
-        # self.base.generateButton.setDisabled(False)
 
     # function to close/hide dynamic content (teacher and subject lists)
     def close_map_window(self):
@@ -167,6 +173,7 @@ class MapWindow:
         self.mapped_subjects_index = []
         self.finalList = []
         self.sharedSubjectIndex = None
+        self.generateButton.setEnabled(False)
 
         # setting 'None' in lieu of 'Shared' if cancel button is pressed
         if self.windowOpened:
@@ -247,7 +254,7 @@ class MapWindow:
 
     # updates the list of subjects that are shared by different teacher for a semester/batch
     def share_subject_between_teachers(self):
-        # generating a mapping in the form dictionary
+        # generating a subject-teacher mapping in the form dictionary
         subject = self.subjectList[self.sharedSubjectIndex]
         mapping = {subject: self.sharedTeachers}
 
@@ -284,7 +291,7 @@ class MapWindow:
         # closing the shared window after done processing
         self.close_sharing_section()
 
-    def single_map(self, teacher_name, subject_name, index):
+    def teacher_to_subjects_map(self, teacher_name, subject_name, index):
         exists_subject_mapping = False
         teacher_to_replace = None
         found_subject = False
@@ -320,28 +327,28 @@ class MapWindow:
         else:
             print('No mapping for this subject')
             found_teacher_match = False
-            mapping = {teacher_name: [subject_name]}  # creating mapping in form of dictionary
+            mapping = {teacher_name: [subject_name]}                # creating mapping in form of dictionary
 
-            if len(self.finalList) == 0:  # when no 1 to 1 mapping is made
-                self.finalList.append(mapping)  # appending the mapping into final list
+            if len(self.finalList) == 0:                            # when no 1 to 1 mapping is made
+                self.finalList.append(mapping)                      # appending the mapping into final list
                 self.mapped_subjects_index.append(index)
                 print('first mapping...')
 
-            else:  # if some 1 to 1 mapping exists already
+            else:                                                   # if some 1 to 1 mapping exists already
                 for each_mapping in self.finalList:
                     for key, value in each_mapping.items():
-                        if teacher_name == key:  # if teacher is already teaching a subject
+                        if teacher_name == key:                     # if teacher is already teaching a subject
                             print('updating mapping...')
                             each_mapping[key].append(subject_name)  # append another subject
                             self.mapped_subjects_index.append(index)
                             found_teacher_match = True
 
                     if found_teacher_match:
-                        break  # stop looking for teacher in finalList
+                        break                                       # stop looking for teacher in finalList
 
                 if not found_teacher_match:
                     print('adding new mapping')
-                    self.finalList.append(mapping)  # add a new mapping in finalList
+                    self.finalList.append(mapping)                  # add a new mapping in finalList
                     self.mapped_subjects_index.append(index)
 
             # test output
@@ -349,3 +356,23 @@ class MapWindow:
                 print(i)
             print(self.mapped_subjects_index)
             print()
+
+    # helper function used when converting subject-teacher mapping to teacher-subject mapping
+    def get_index_for_subject(self, subject_name):
+        for i in range(len(self.subjectList)):
+            if subject_name == self.subjectList[i]:
+                return i                                            # i is an index
+
+    # generating time table after all required mappings are made
+    def generate_time_table(self):
+        # converting subject-teachers mapping into subject-teacher mappings
+        for each_mapping in self.sharedList:
+            for subject, teachers in each_mapping.items():
+                sub_index = self.get_index_for_subject(subject)
+                for teacher in teachers:
+                    self.teacher_to_subjects_map(teacher, subject, sub_index)
+
+        # test output
+        for i in self.finalList:
+            print(i)
+        print()
