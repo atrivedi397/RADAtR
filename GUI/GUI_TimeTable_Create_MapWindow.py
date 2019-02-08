@@ -12,6 +12,7 @@ class MapWindow:
         self.windowOpened = False                  # used as a flag to know if 'share teacher' window is open or not
         self.sharingMade = False                   # used as a flag to know if sharing is made or not
         self.sharedList = []                       # contains subject-name along with names of teachers who shares it
+        self.mapped_subjects_index = []            # index numbers (of subjects) for which mapping has been done
         self.teachersSelectedForSharing = 0        # counter, responsible for enabling/disabling 'share' button
         self.sharedTeachers = []                   # list of teachers which are selected to share same subject
         self.sharedSubjectIndex = None             # index of the subject which gets shared between teachers
@@ -109,36 +110,8 @@ class MapWindow:
             teacher_name = self.teachers[index_of_teacher]
             subject_name = self.subjectList[index]
 
-            found_teacher_match = False
-            new_mapping_added = False
-            mapping = {teacher_name: [subject_name]}                        # creating mapping in form of dictionary
-
-            if len(self.finalList) == 0:                                    # when no 1 to 1 mapping is made
-                self.finalList.append(mapping)                              # appending the mapping into final list
-                print('first mapping...')
-
-            else:                                                           # if some 1 to 1 mapping exists already
-                for each_mapping in self.finalList:
-                    for key, value in each_mapping.items():
-                        # if subject_name == value:
-                        #     print('mapping must be renewed')
-
-                        if teacher_name == key:                           # if teacher is already teaching a subject
-                            print('updating mapping...')
-                            each_mapping[key].append(subject_name)          # append another subject
-                            found_teacher_match = True
-
-                    if found_teacher_match:
-                        break                                               # stop looking for teacher in finalList
-
-                if not found_teacher_match:
-                    print('adding new mapping')
-                    self.finalList.append(mapping)                          # add a new mapping in finalList
-
-            # test output
-            for i in self.finalList:
-                print(i)
-            print()
+            # generating single mappings and updating finalList
+            self.single_map(teacher_name, subject_name, index)
 
     # helper function for 'mapping_options()'
     def create_combo_box(self, for_index):
@@ -190,6 +163,9 @@ class MapWindow:
         # resetting dependencies
         self.teachersSelectedForSharing = 0
         self.sharedTeachers = []
+        self.sharedSubjectIndex = None
+        self.mapped_subjects_index = []
+        self.finalList = []
         self.sharedSubjectIndex = None
 
         # setting 'None' in lieu of 'Shared' if cancel button is pressed
@@ -307,3 +283,69 @@ class MapWindow:
 
         # closing the shared window after done processing
         self.close_sharing_section()
+
+    def single_map(self, teacher_name, subject_name, index):
+        exists_subject_mapping = False
+        teacher_to_replace = None
+        found_subject = False
+
+        # checking if a mapping for given subject already exists
+        for i in self.mapped_subjects_index:
+            if i == index:
+                print('Mapping Exists for the given subject')
+                exists_subject_mapping = True
+
+        if exists_subject_mapping:
+            for each_mapping in self.finalList:
+                for key, values in each_mapping.items():        # iterate on each mapping (ie dictionary),
+                    for value in values:                        # iterate on dictionary values (ie a list) 1 by 1,
+                        if value == self.subjectList[index]:    # checking if the subject is already mapped,
+                            teacher_to_replace = key            # store name of teacher to be replaced for the subject
+                            found_subject = True
+                            break                               # stop iterating further on values
+
+                if found_subject:
+                    break                                       # stop iterating further on mappings (ie dictionaries)
+
+            # iterate on finalList to find the teacher which has to be replaced
+            for each_dictionary in self.finalList:
+                for key, value in each_dictionary.items():
+                    if key == teacher_to_replace:
+                        mapping_to_remove = {key: value}            # fetching the desired dictionary
+                        self.finalList.remove(mapping_to_remove)    # removing it from the list
+
+            new_mapping = {teacher_name: [subject_name]}            # creating new mapping
+            self.finalList.append(new_mapping)                      # appending it to list
+
+        else:
+            print('No mapping for this subject')
+            found_teacher_match = False
+            mapping = {teacher_name: [subject_name]}  # creating mapping in form of dictionary
+
+            if len(self.finalList) == 0:  # when no 1 to 1 mapping is made
+                self.finalList.append(mapping)  # appending the mapping into final list
+                self.mapped_subjects_index.append(index)
+                print('first mapping...')
+
+            else:  # if some 1 to 1 mapping exists already
+                for each_mapping in self.finalList:
+                    for key, value in each_mapping.items():
+                        if teacher_name == key:  # if teacher is already teaching a subject
+                            print('updating mapping...')
+                            each_mapping[key].append(subject_name)  # append another subject
+                            self.mapped_subjects_index.append(index)
+                            found_teacher_match = True
+
+                    if found_teacher_match:
+                        break  # stop looking for teacher in finalList
+
+                if not found_teacher_match:
+                    print('adding new mapping')
+                    self.finalList.append(mapping)  # add a new mapping in finalList
+                    self.mapped_subjects_index.append(index)
+
+            # test output
+            for i in self.finalList:
+                print(i)
+            print(self.mapped_subjects_index)
+            print()
