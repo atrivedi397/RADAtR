@@ -1,5 +1,6 @@
 from Detached.Global.Configurations.ConnectionEstablishment import *
 from Detached.Global.Variables.varFile1 import totalWorkingDays, maximumSlots
+from Detached.Global.Configurations.LocalUsersConfigurations import *           # local User configurations
 import json
 
 
@@ -42,9 +43,12 @@ def get_teacher_details(uid):
     return db[teacher_collection].find({"uid": uid})
 
 
+# static address of JSON file, must be updated according to one's PC
 def load_teachers_at_once():
-    # static address of JSON file, must be updated according to one's PC
-    with open("/home/dev/RADAtR/Detached/Database/teachers.json") as f:
+    file_location = 'Detached/Database/teachers.json'
+    complete_address = project_location + file_location
+
+    with open(complete_address) as f:
         file_data = json.load(f)
 
     db[teacher_collection].insert(file_data)
