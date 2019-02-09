@@ -25,6 +25,10 @@ class TimeTable:
         pass
 
     def place(self, teacher_to_place):   # teacher-subject mapping should be provided with teacher as keys
+        teacher_list = []
+        for value in teacher_to_place:
+            teacher_list.append(value.keys())
+
         while True:
             # creating a matrix for [days*slots], rows represents days and columns represent slots
             time_table = [[None for _ in range(maximumSlots)] for _ in range(len(self.daysList))]
@@ -33,7 +37,7 @@ class TimeTable:
                     # randomly picking a teacher from the given mapping
                     """teacher_to_place.keys() can be replaced with teacher_
                        to_place only iff the argument teacher_to_place is a list"""
-                    selected_teacher = self.random(teacher_to_place.keys())
+                    selected_teacher = self.random(teacher_list)
 
                     # checking if the randomly selected teacher is available for a particular slot or not
                     if selected_teacher in get_teacher_availability_for_a_slot(self.daysList[day], slot + 1):
