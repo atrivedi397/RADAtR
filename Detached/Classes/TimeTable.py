@@ -23,30 +23,52 @@ class TimeTable:
            MCA-401 => T3, MCA-402 => T1, MCA-403 => T2, MCA-404 => T6, MCA-405 => T4 """
         pass
 
-    def place(self, teacher_to_place):
+    def place(self, teacher_to_place):   # teacher-subject mapping should be provided with teacher as keys
         while True:
-            time_table = [[None for _ in range(len(days_list))] for _ in range(maximumSlots)]
-            for index in range(len(time_table)):
-                for day in range(len(time_table[index])):
-                    for slot in range(maximumSlots):
-                        time_table[slot][day] = self.random(teacher_to_place)
+            # creating a matrix for [days*slots], rows represents days and columns represent slots
+            time_table = [[None for _ in range(maximumSlots)] for _ in range(len(days_list))]
+            for slot in range(maximumSlots):
+                for day in range(len(time_table)):
+                    # randomly picking a teacher from the given mapping
+                    """teacher_to_place.keys() can be replaced with teacher_
+                       to_place only iff the argument teacher_to_place is a list"""
+                    selected_teacher = self.random(teacher_to_place)
 
+                    # checking if the randomly selected teacher is available for a particular slot or not
+                    if selected_teacher in get_teacher_availability_for_a_slot(days_list[day], slot + 1):
+                        time_table[day][slot] = selected_teacher
+                    else:
+                        time_table[day][slot] = "-"  # putting blank if selected teacher is unavailable for slot
+
+            """The output format is like 
+            row 1 -> Monday schedule
+            row 2 -> Tuesday schedule
+            row 3 -> Wednesday schedule.."""
             for value in time_table:
                 print(value)
+                print()
 
+            """This following lines must be edited according to the semester or course for which time table is created
             db[time_table_collection].insert({"course": "MCA",
                                               "semester": "1",
-                                              "previous_one": time_table})
+                                              "previous_one": time_table})"""
 
+            # taking input and asking for satisfaction : if yes : saved into database
             value = int(input("\nAre you satisfied?\n1. Yes\n0.No\n"))
             if value:
+                i = 0
                 for index in range(len(time_table)):
-                    for i in range(len(time_table[index])):
+                    for _ in range(len(time_table[index])):
                         query = "empty_slots" + ".$[]." + str(days_list[i])
                         slot_no = str(index + 1)
-
+                        # pulling out the empty_slots from respective teachers
                         db[teacher_collection].find_one_and_update({"uid": str(time_table[index][i])},
                                                                    {"$pull": {query: slot_no}})
+                        if i >= 4:
+                            i = 0
+                        else:
+                            i += 1
+                # saving the time_table in database for semester(semester, course can be changed),
                 db[time_table_collection].find_one_and_update({"course": "MCA", "semester": "1"},
                                                               {"$set": {"latest": time_table}})
                 break
@@ -95,9 +117,9 @@ def get_teacher_availability_for_a_slot(day, slot_to_check):
     free_teachers_for_slot = []
     # making a list of dictionaries available teachers and their respective uid for a slot on a day
     for value in cursor:
-        free_teachers_for_slot.append({value["name"]: value["uid"]})
+        free_teachers_for_slot.append(value["name"])  # can be changed to value["uid"] if uid is needed
 
-    print(free_teachers_for_slot)
+    # print(free_teachers_for_slot)
     return free_teachers_for_slot
 
 
@@ -109,6 +131,7 @@ def update_subjects_of_teachers(list_of_dictionaries):
                                                        {"$set": {"subjects": values}})
 
 
+"""Example Usage"""
 obj = TimeTable()
 val0, val, val2 = fetch_empty_slots("MCA")
 obj.place(val0)
