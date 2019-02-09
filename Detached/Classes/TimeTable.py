@@ -16,6 +16,7 @@ class TimeTable:
         """ format => [ {"Monday" : [1,2,3] }, {"Tuesday" : [1,2,3,4] } ]"""
 
         self.freeLectures = []                      # initially empty, used as the list on which to iterate for placing lectures
+        self.daysList = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"]
 
     def map(self, teachers):                        # teachers: T3, T1, T2, T6, T4  (as an example)
         """Mapping is done on the basis matching the sequence of subjects and sequence of teachers provided as in the list.
@@ -26,7 +27,7 @@ class TimeTable:
     def place(self, teacher_to_place):   # teacher-subject mapping should be provided with teacher as keys
         while True:
             # creating a matrix for [days*slots], rows represents days and columns represent slots
-            time_table = [[None for _ in range(maximumSlots)] for _ in range(len(days_list))]
+            time_table = [[None for _ in range(maximumSlots)] for _ in range(len(self.daysList))]
             for slot in range(maximumSlots):
                 for day in range(len(time_table)):
                     # randomly picking a teacher from the given mapping
@@ -35,7 +36,7 @@ class TimeTable:
                     selected_teacher = self.random(teacher_to_place.keys())
 
                     # checking if the randomly selected teacher is available for a particular slot or not
-                    if selected_teacher in get_teacher_availability_for_a_slot(days_list[day], slot + 1):
+                    if selected_teacher in get_teacher_availability_for_a_slot(self.daysList[day], slot + 1):
                         time_table[day][slot] = {selected_teacher: teacher_to_place[selected_teacher]}
                     else:
                         time_table[day][slot] = "-"  # putting blank if selected teacher is unavailable for slot
@@ -59,7 +60,7 @@ class TimeTable:
                 i = 0
                 for index in range(len(time_table)):
                     for _ in range(len(time_table[index])):
-                        query = "empty_slots" + ".$[]." + str(days_list[i])
+                        query = "empty_slots" + ".$[]." + str(self.daysList[i])
                         slot_no = str(index + 1)
                         # pulling out the empty_slots from respective teachers
                         db[teacher_collection].find_one_and_update({"uid": str(time_table[index][i])},
@@ -133,6 +134,6 @@ def update_subjects_of_teachers(list_of_dictionaries):
 
 
 """Example Usage"""
-obj = TimeTable()
-val0, val, val2 = fetch_empty_slots("MCA")
-obj.place(val0)
+# obj = TimeTable()
+# val0, val, val2 = fetch_empty_slots("MCA")
+# obj.place(val0)

@@ -1,5 +1,6 @@
 from PyQt5.QtWidgets import *
 from Detached.Global.Functions.IndependentFunctions import get_list_of_subject_for
+from Detached.Classes.TimeTable import *
 
 
 class MapWindow:
@@ -376,3 +377,7 @@ class MapWindow:
         for i in self.finalList:
             print(i)
         print()
+
+        # creating timeTable object
+        obj = TimeTable()
+        obj.place(self.finalList)
