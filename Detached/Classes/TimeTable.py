@@ -27,11 +27,14 @@ class TimeTable:
     def place(self, teacher_to_place):   # teacher-subject mapping should be provided with teacher as keys
         teacher_list = []
         for value in teacher_to_place:
-            teacher_list.append(value.keys())
+            temp_name = str(value.keys())
+            name = temp_name[12:-3]  # only extracting the name from whole word from string "dict_keys([\\Name\\])"
+            teacher_list.append(name)
 
         while True:
             # creating a matrix for [days*slots], rows represents days and columns represent slots
-            time_table = [[None for _ in range(maximumSlots)] for _ in range(len(self.daysList))]
+            # it is a nested list of dictionaries in which every dictionary represent {teacher:subjects}
+            time_table = [[{} for _ in range(maximumSlots)] for _ in range(len(self.daysList))]
             for slot in range(maximumSlots):
                 for day in range(len(time_table)):
                     # randomly picking a teacher from the given mapping
@@ -41,9 +44,11 @@ class TimeTable:
 
                     # checking if the randomly selected teacher is available for a particular slot or not
                     if selected_teacher in get_teacher_availability_for_a_slot(self.daysList[day], slot + 1):
-                        time_table[day][slot] = {selected_teacher: teacher_to_place[selected_teacher]}
+                        for dictionary in teacher_to_place:
+                            if selected_teacher in dictionary:
+                                time_table[day][slot][selected_teacher] = dictionary[selected_teacher]
                     else:
-                        time_table[day][slot] = "-"  # putting blank if selected teacher is unavailable for slot
+                        time_table[day][slot]["not"] = "-"  # putting blank if selected teacher is unavailable for slot
 
             """The output format is like 
             row 1 -> Monday schedule
