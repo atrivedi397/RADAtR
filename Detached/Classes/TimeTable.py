@@ -32,11 +32,11 @@ class TimeTable:
                     # randomly picking a teacher from the given mapping
                     """teacher_to_place.keys() can be replaced with teacher_
                        to_place only iff the argument teacher_to_place is a list"""
-                    selected_teacher = self.random(teacher_to_place)
+                    selected_teacher = self.random(teacher_to_place.keys())
 
                     # checking if the randomly selected teacher is available for a particular slot or not
                     if selected_teacher in get_teacher_availability_for_a_slot(days_list[day], slot + 1):
-                        time_table[day][slot] = selected_teacher
+                        time_table[day][slot] = {selected_teacher: teacher_to_place[selected_teacher]}
                     else:
                         time_table[day][slot] = "-"  # putting blank if selected teacher is unavailable for slot
 
@@ -68,7 +68,7 @@ class TimeTable:
                             i = 0
                         else:
                             i += 1
-                # saving the time_table in database for semester(semester, course can be changed),
+                # saving the time_table in database for semester(semester, course can be changed), 
                 db[time_table_collection].find_one_and_update({"course": "MCA", "semester": "1"},
                                                               {"$set": {"latest": time_table}})
                 break
@@ -79,6 +79,7 @@ class TimeTable:
         _, uid, empty = fetch_empty_slots("MCA")
         print(empty)
         print(uid)
+        return time_table
 
     def random(self, list_of_teachers):
         global choice_taken
