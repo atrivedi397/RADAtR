@@ -25,14 +25,18 @@ class TimeTable:
 
     def place(self, teacher_to_place):
         while True:
-            time_table = [[None for _ in range(len(days_list))] for _ in range(maximumSlots)]
-            for index in range(len(time_table)):
-                for day in range(len(time_table[index])):
-                    for slot in range(maximumSlots):
-                        time_table[slot][day] = self.random(teacher_to_place)
+            time_table = [[None for _ in range(maximumSlots)] for _ in range(len(days_list))]
+            for slot in range(maximumSlots):
+                for day in range(len(time_table)):
+                    selected_teacher = self.random(teacher_to_place)
+                    if selected_teacher in get_teacher_availability_for_a_slot(days_list[day], slot + 1):
+                        time_table[day][slot] = selected_teacher
+                    else:
+                        time_table[day][slot] = "-"
 
             for value in time_table:
                 print(value)
+                print()
 
             db[time_table_collection].insert({"course": "MCA",
                                               "semester": "1",
@@ -95,9 +99,9 @@ def get_teacher_availability_for_a_slot(day, slot_to_check):
     free_teachers_for_slot = []
     # making a list of dictionaries available teachers and their respective uid for a slot on a day
     for value in cursor:
-        free_teachers_for_slot.append({value["name"]: value["uid"]})
+        free_teachers_for_slot.append(value["name"])
 
-    print(free_teachers_for_slot)
+    # print(free_teachers_for_slot)
     return free_teachers_for_slot
 
 
