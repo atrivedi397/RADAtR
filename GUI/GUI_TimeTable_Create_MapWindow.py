@@ -1,6 +1,6 @@
 from PyQt5.QtWidgets import *
 from Detached.Global.Functions.IndependentFunctions import get_list_of_subject_for
-from Detached.Classes.TimeTable import *
+from GUI.IndividualWidgets.GUI_TimeTable_Output import *
 
 
 class MapWindow:
@@ -150,6 +150,9 @@ class MapWindow:
 
     # function to close/hide dynamic content (teacher and subject lists)
     def close_map_window(self):
+        # resetting values
+        self.mapped_subjects_index = []
+
         # external code to empty the (dynamic layout)
         while self.mapArea.count() > 0:
             item = self.mapArea.takeAt(0)
@@ -171,10 +174,8 @@ class MapWindow:
         self.teachersSelectedForSharing = 0
         self.sharedTeachers = []
         self.sharedSubjectIndex = None
-        self.mapped_subjects_index = []
         self.finalList = []
         self.sharedSubjectIndex = None
-        self.generateButton.setEnabled(False)
 
         # setting 'None' in lieu of 'Shared' if cancel button is pressed
         if self.windowOpened:
@@ -265,7 +266,6 @@ class MapWindow:
             for each_dictionary in self.sharedList:
                 for key, values in each_dictionary.items():
                     if subject == key:
-                        print('updating existing value')
                         each_dictionary[key] = self.sharedTeachers      # updating the teacher names for the subject
                         subject_match_found = True
                         break
@@ -277,8 +277,7 @@ class MapWindow:
                     self.sharedList.append(mapping)                     # append the new mapping
                     break
 
-        else:  # if no mapping exists
-            print('creating first mapping...')
+        else:                                                           # if no mapping exists
             self.sharedList.append(mapping)
 
         # updating the flag to refer sharing is made
@@ -300,7 +299,6 @@ class MapWindow:
         # checking if a mapping for given subject already exists
         for i in self.mapped_subjects_index:
             if i == index:
-                print('Mapping Exists for the given subject')
                 exists_subject_mapping = True
 
         if exists_subject_mapping:
@@ -326,20 +324,17 @@ class MapWindow:
             self.finalList.append(new_mapping)                      # appending it to list
 
         else:
-            print('No mapping for this subject')
             found_teacher_match = False
             mapping = {teacher_name: [subject_name]}                # creating mapping in form of dictionary
 
             if len(self.finalList) == 0:                            # when no 1 to 1 mapping is made
                 self.finalList.append(mapping)                      # appending the mapping into final list
                 self.mapped_subjects_index.append(index)
-                print('first mapping...')
 
             else:                                                   # if some 1 to 1 mapping exists already
                 for each_mapping in self.finalList:
                     for key, value in each_mapping.items():
                         if teacher_name == key:                     # if teacher is already teaching a subject
-                            print('updating mapping...')
                             each_mapping[key].append(subject_name)  # append another subject
                             self.mapped_subjects_index.append(index)
                             found_teacher_match = True
@@ -348,15 +343,8 @@ class MapWindow:
                         break                                       # stop looking for teacher in finalList
 
                 if not found_teacher_match:
-                    print('adding new mapping')
                     self.finalList.append(mapping)                  # add a new mapping in finalList
                     self.mapped_subjects_index.append(index)
-
-            # test output
-            for i in self.finalList:
-                print(i)
-            print(self.mapped_subjects_index)
-            print()
 
     # helper function used when converting subject-teacher mapping to teacher-subject mapping
     def get_index_for_subject(self, subject_name):
@@ -378,6 +366,10 @@ class MapWindow:
             print(i)
         print()
 
-        # creating timeTable object
-        obj = TimeTable()
-        obj.place(self.finalList)
+        # calling time-table output class
+        self.show_time_table()
+
+    # calling another widget/window which displays the time-table
+    def show_time_table(self):
+        self.output = Timetable(None, self.finalList)
+        self.output.show()
