@@ -14,6 +14,7 @@ class MapWindow:
         self.windowOpened = False                  # used as a flag to know if 'share teacher' window is open or not
         self.sharingMade = False                   # used as a flag to know if sharing is made or not
         self.sharedList = []                       # contains subject-name along with names of teachers who shares it
+        self.mapped_shared_subjects_index = []     # index numbers (of subjects) for which shared mapping has been done
         self.mapped_subjects_index = []            # index numbers (of subjects) for which mapping has been done
         self.teachersSelectedForSharing = 0        # counter, responsible for enabling/disabling 'share' button
         self.sharedTeachers = []                   # list of teachers which are selected to share same subject
@@ -59,7 +60,27 @@ class MapWindow:
         index_of_teacher = self.teacher_combo_boxes[index].currentIndex()
 
         if value == 'None':
-            pass
+            mapping_already_removed = False
+
+            # looking for the subject index if it exists already in shared-mapped list
+            for i in self.mapped_shared_subjects_index:
+                if i == index:                                          # means (shared) mapping exists
+                    self.remove_shared_mapping(i)                       # remove existing mapping (from sharedList)
+                    mapping_already_removed = True
+
+            if not mapping_already_removed:                             # means (dedicated) mapping exists
+                self.remove_mapping(index)                              # remove existing mapping (from finalList)
+
+            # test outputs
+            for i in self.sharedList:
+                print(i)
+            print(f'Shared Indexes mapped: {self.mapped_shared_subjects_index}')
+            print()
+            print('Final List is as follow:')
+            for i in self.finalList:
+                print(i)
+            print(f'Indexes mapped: {self.mapped_subjects_index}')
+            print()
 
         elif value == 'Shared':
             # showing vertical line (to separate 2 sub windows)
@@ -115,6 +136,18 @@ class MapWindow:
             # generating single mappings and updating finalList
             self.teacher_to_subjects_map(teacher_name, subject_name, index)
 
+            # test outputs
+            print('Shared List is as follow:')
+            for i in self.sharedList:
+                print(i)
+            print(f'Shared Indexes mapped: {self.mapped_shared_subjects_index}')
+            print()
+            print('Final List is as follow:')
+            for i in self.finalList:
+                print(i)
+            print(f'Indexes mapped: {self.mapped_subjects_index}')
+            print()
+
         # enable 'Generate' button only when total mappings are equals to number of subjects
         total_mappings = len(self.mapped_subjects_index)
         if total_mappings == len(self.subjectList):
@@ -151,7 +184,8 @@ class MapWindow:
     # function to close/hide dynamic content (teacher and subject lists)
     def close_map_window(self):
         # resetting values
-        self.mapped_subjects_index = []
+        self.finalList = []
+        self.mapped_subjects_index = []                             # decides enabling/disabling of 'Generate' button
 
         # external code to empty the (dynamic layout)
         while self.mapArea.count() > 0:
@@ -173,8 +207,6 @@ class MapWindow:
         # resetting dependencies
         self.teachersSelectedForSharing = 0
         self.sharedTeachers = []
-        self.sharedSubjectIndex = None
-        self.finalList = []
         self.sharedSubjectIndex = None
 
         # setting 'None' in lieu of 'Shared' if cancel button is pressed
@@ -260,8 +292,13 @@ class MapWindow:
         subject = self.subjectList[self.sharedSubjectIndex]
         mapping = {subject: self.sharedTeachers}
 
+        # removing dedicated mapping if exists in final list
+        for index in self.mapped_subjects_index:
+            if index == self.sharedSubjectIndex:
+                self.remove_mapping(index)
+
         # update the value (ie teacher names) if mapping for the same subject already exists
-        if len(self.sharedList) > 0:  # means some mappings exist
+        if len(self.sharedList) > 0:                                    # means some mappings exist
             subject_match_found = False
             for each_dictionary in self.sharedList:
                 for key, values in each_dictionary.items():
@@ -275,28 +312,59 @@ class MapWindow:
                 else:                                                   # if mapping for the subject doesn't exists
                     print('creating new mapping')
                     self.sharedList.append(mapping)                     # append the new mapping
+                    self.mapped_shared_subjects_index.append(self.sharedSubjectIndex)
                     break
 
         else:                                                           # if no mapping exists
             self.sharedList.append(mapping)
+            self.mapped_shared_subjects_index.append(self.sharedSubjectIndex)
 
         # updating the flag to refer sharing is made
         self.sharingMade = True
 
         # test output
+        print('Shared List is as follow:')
         for i in self.sharedList:
             print(i)
+        print(f'Shared Indexes: {self.mapped_shared_subjects_index}')
+        print()
+        print('Final List is as follow:')
+        for i in self.finalList:
+            print(i)
+        print(f'Indexes mapped: {self.mapped_subjects_index}')
         print()
 
         # closing the shared window after done processing
         self.close_sharing_section()
+
+    # function to remove subject-teachers mapping from shared list, for which a dedicated teacher mapping has been done
+    def remove_shared_mapping(self, mapping_index):
+        for mapping in self.sharedList:
+            for subject, teachers in mapping.items():
+                if subject == self.subjectList[mapping_index]:
+                    self.sharedList.remove(mapping)
+                    self.mapped_shared_subjects_index.remove(mapping_index)
+
+    # function to remove teacher-subjects mapping, for which a shared mapping has been made
+    def remove_mapping(self, mapping_index):
+        for each_mapping in self.finalList:
+            for teacher, subjects in each_mapping.items():
+                for subject in subjects:
+                    if subject == self.subjectList[mapping_index]:
+                        self.finalList.remove(each_mapping)
+                        self.mapped_subjects_index.remove(mapping_index)
 
     def teacher_to_subjects_map(self, teacher_name, subject_name, index):
         exists_subject_mapping = False
         teacher_to_replace = None
         found_subject = False
 
-        # checking if a mapping for given subject already exists
+        # checking if a mapping for given subject already exists (in shared mapping list). If exists, delete the mapping
+        for i in self.mapped_shared_subjects_index:
+            if i == index:
+                self.remove_shared_mapping(index)
+
+        # checking if a mapping for given subject already exists (in dedicated mapping list)
         for i in self.mapped_subjects_index:
             if i == index:
                 exists_subject_mapping = True
