@@ -30,7 +30,7 @@ class Timetable(QWidget):
         self.tableWidget.setVerticalHeaderLabels(days_list)
         self.tableWidget.setHorizontalHeaderLabels(time_slot)
 
-        self.tableWidget.setItem(0, 0, QTableWidgetItem())
+        self.tableWidget.setItem(0, 0, QTableWidgetItem(i))
         self.tableWidget.setItem(0, 1, QTableWidgetItem())
         self.tableWidget.setItem(0, 2, QTableWidgetItem())
 
