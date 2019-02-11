@@ -133,7 +133,9 @@ class TimeTableWindow:
 
     # function called on click of 'Generate' button
     def process_generate_button(self):
-        self.mapSubWinClass.generate_time_table()
+        batch_no = self.batchField.text()
+        batch_timing = self.timingField.text()
+        self.mapSubWinClass.generate_time_table(batch_no, batch_timing)
 
     # to close entire 'create Time Table' window
     def close_create_window(self):

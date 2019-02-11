@@ -7,6 +7,8 @@ class MapWindow:
     def __init__(self, parent=None, widget=None):
         # dependencies
         self.generateButton = widget               # refers to the 'Generate' button which is located in parent widget
+        self.course = None                         # to be fetched from the admin class
+        self.semester = None                       # will get updated by 'generate_time_table' function
         self.teachers = ["None", "Shared", "Manoj Kumar", "Narendra Kumar", "Sanjay Kumar Dwivedi", "Vipin Saxena", "Deepa Raj", "Shalini Chandra"]
         self.teacher_combo_boxes = []              # multiple comboBoxes are required to show dropDowns for each subject
         self.callingComboBoxIndex = None           # to identify which combo Box sent the signal or assigned a value
@@ -72,15 +74,15 @@ class MapWindow:
                 self.remove_mapping(index)                              # remove existing mapping (from finalList)
 
             # test outputs
-            for i in self.sharedList:
-                print(i)
-            print(f'Shared Indexes mapped: {self.mapped_shared_subjects_index}')
-            print()
-            print('Final List is as follow:')
-            for i in self.finalList:
-                print(i)
-            print(f'Indexes mapped: {self.mapped_subjects_index}')
-            print()
+            # for i in self.sharedList:
+            #     print(i)
+            # print(f'Shared Indexes mapped: {self.mapped_shared_subjects_index}')
+            # print()
+            # print('Final List is as follow:')
+            # for i in self.finalList:
+            #     print(i)
+            # print(f'Indexes mapped: {self.mapped_subjects_index}')
+            # print()
 
         elif value == 'Shared':
             # showing vertical line (to separate 2 sub windows)
@@ -137,16 +139,16 @@ class MapWindow:
             self.teacher_to_subjects_map(teacher_name, subject_name, index)
 
             # test outputs
-            print('Shared List is as follow:')
-            for i in self.sharedList:
-                print(i)
-            print(f'Shared Indexes mapped: {self.mapped_shared_subjects_index}')
-            print()
-            print('Final List is as follow:')
-            for i in self.finalList:
-                print(i)
-            print(f'Indexes mapped: {self.mapped_subjects_index}')
-            print()
+            # print('Shared List is as follow:')
+            # for i in self.sharedList:
+            #     print(i)
+            # print(f'Shared Indexes mapped: {self.mapped_shared_subjects_index}')
+            # print()
+            # print('Final List is as follow:')
+            # for i in self.finalList:
+            #     print(i)
+            # print(f'Indexes mapped: {self.mapped_subjects_index}')
+            # print()
 
         # enable 'Generate' button only when total mappings are equals to number of subjects
         total_mappings = len(self.mapped_subjects_index)
@@ -163,15 +165,18 @@ class MapWindow:
         return teacher_options_widget
 
     def display_mapping_options(self, for_semester):
+        # updating semester value which will be passed to 'TimeTable' via 'generate_time_table' function
+        self.semester = for_semester
+
         prompt = QLabel('Please assign the following subjects with their respective lecturer')
         prompt.setContentsMargins(0, 0, 0, 20)
         self.mapArea.addWidget(prompt)
 
-        course = "MCA"                                      # This value is dependent on the Admin attribute
+        self.course = "MCA"                                      # This value is dependent on the Admin attribute
         semester = for_semester                             # getting semester number
 
         # getting list of subjects for the desired course and semester
-        self.subjectList = get_list_of_subject_for(course, semester)
+        self.subjectList = get_list_of_subject_for(self.course, semester)
 
         self.teacher_combo_boxes = []                       # resetting list to be empty
         # creating list of comboBoxes with having same dropDown items
@@ -310,7 +315,7 @@ class MapWindow:
                 if subject_match_found:
                     break                                               # stop looking for the subject
                 else:                                                   # if mapping for the subject doesn't exists
-                    print('creating new mapping')
+                    # print('creating new mapping')
                     self.sharedList.append(mapping)                     # append the new mapping
                     self.mapped_shared_subjects_index.append(self.sharedSubjectIndex)
                     break
@@ -323,16 +328,16 @@ class MapWindow:
         self.sharingMade = True
 
         # test output
-        print('Shared List is as follow:')
-        for i in self.sharedList:
-            print(i)
-        print(f'Shared Indexes: {self.mapped_shared_subjects_index}')
-        print()
-        print('Final List is as follow:')
-        for i in self.finalList:
-            print(i)
-        print(f'Indexes mapped: {self.mapped_subjects_index}')
-        print()
+        # print('Shared List is as follow:')
+        # for i in self.sharedList:
+        #     print(i)
+        # print(f'Shared Indexes: {self.mapped_shared_subjects_index}')
+        # print()
+        # print('Final List is as follow:')
+        # for i in self.finalList:
+        #     print(i)
+        # print(f'Indexes mapped: {self.mapped_subjects_index}')
+        # print()
 
         # closing the shared window after done processing
         self.close_sharing_section()
@@ -421,7 +426,7 @@ class MapWindow:
                 return i                                            # i is an index
 
     # generating time table after all required mappings are made
-    def generate_time_table(self):
+    def generate_time_table(self, batch, timing):
         # converting subject-teachers mapping into subject-teacher mappings
         for each_mapping in self.sharedList:
             for subject, teachers in each_mapping.items():
@@ -429,15 +434,10 @@ class MapWindow:
                 for teacher in teachers:
                     self.teacher_to_subjects_map(teacher, subject, sub_index)
 
-        # test output
-        for i in self.finalList:
-            print(i)
-        print()
-
         # calling time-table output class
-        self.show_time_table()
+        self.show_time_table(batch, timing)
 
     # calling another widget/window which displays the time-table
-    def show_time_table(self):
-        self.output = Timetable(None, self.finalList)
+    def show_time_table(self, batch, timing):
+        self.output = TimeTableDisplayWindow(None, self.finalList, self.course, self.semester, batch, timing)
         self.output.show()

@@ -4,19 +4,34 @@ from Detached.Global.Functions.IndependentFunctions import add_time_to
 from Detached.Classes.TimeTable import *
 
 
-class Timetable(QMainWindow):
+class TimeTableDisplayWindow(QMainWindow):
 
-    def __init__(self, parent=None, slots_list=None):
+    def __init__(self, parent=None, slots_list=None, course=None, semester=None, batch_no='1', batch_timing=starting_time):
         super().__init__(parent)
         self.title = 'Time Table'
+        self.course = course
+        self.semester = semester
         self.days_list = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"]
-        self.baseTime = '1000'
+        self.batchNo = batch_no
+        self.baseTime = starting_time
         self.slotDuration = '60'
         self.slots = []
         self.listOfSlots = slots_list
 
+        # batch timing validations
+        if self.baseTime == '':
+            self.baseTime = str(starting_time)
+        else:
+            self.baseTime = batch_timing
+
+        # batch number validation
+        if self.batchNo == '':
+            self.batchNo = '1'
+        else:
+            self.batchNo = batch_no
+
         # creating an object of 'TimeTable' class to generate time table
-        self.time_table = TimeTable()
+        self.time_table = TimeTable(self.course, self.semester, self.batchNo, self.baseTime)
 
         self.setWindowTitle(self.title)
         self.setFixedSize(938, 480)
@@ -77,8 +92,12 @@ class Timetable(QMainWindow):
                 # storing slot starting time
                 start = self.baseTime
 
+                # batch timing validations
+                if start == '':
+                    start = str(starting_time)
+
                 # calculating end time for the current slot
-                end = add_time_to(self.baseTime, self.slotDuration)
+                end = add_time_to(start, self.slotDuration)
                 self.baseTime = end
 
                 # creating label for slots
@@ -87,16 +106,15 @@ class Timetable(QMainWindow):
 
     def assign_mappings(self):
         mapping_list = self.time_table.place(self.listOfSlots)
-        print(type(mapping_list))
 
-
-def main():
-    ObjQApplication = QApplication(sys.argv)
-    ObjQApplication.setStyle('Fusion')
-    Objtimetable = Timetable()
-    Objtimetable.show()
-    sys.exit(ObjQApplication.exec_())
-
-
-if __name__ == '__main__':
-    main()
+#
+# def main():
+#     ObjQApplication = QApplication(sys.argv)
+#     ObjQApplication.setStyle('Fusion')
+#     Objtimetable = Timetable()
+#     Objtimetable.show()
+#     sys.exit(ObjQApplication.exec_())
+#
+#
+# if __name__ == '__main__':
+#     main()
