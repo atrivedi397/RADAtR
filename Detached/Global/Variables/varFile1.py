@@ -1,5 +1,6 @@
 # -------- values decided by governing authority -----
 totalWorkingDays = 5
+<<<<<<< HEAD
 maximumSlots = 6  # maximum possibility of total lectures in a day
 days_list = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"]
 starting_time = 1000
@@ -26,8 +27,14 @@ dictionary_of_teachers = [
 for i in dictionary_of_teachers:
     #for j, k in i:
     print(i)
+=======
+maximumSlots = 7                    # maximum possibility of total lectures in a day
 
-# print(dictionary_of_teachers)
+starting_time = 1000
+duration = 60                       # in minutes
+lunch_slot_no = 4
+>>>>>>> e239d900e8d5cb2106a9e33278af9f53ca051750
+
 
 # -------- teacher oriented variables --------------
 # Professors Ranks

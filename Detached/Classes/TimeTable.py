@@ -1,4 +1,6 @@
-from Detached.Global.Variables.varFile1 import maximumSlots
+import random
+
+from Detached.Global.Variables.varFile1 import *
 from Detached.Global.Configurations.ConnectionEstablishment import *
 
 
@@ -14,6 +16,7 @@ class TimeTable:
         """ format => [ {"Monday" : [1,2,3] }, {"Tuesday" : [1,2,3,4] } ]"""
 
         self.freeLectures = []                      # initially empty, used as the list on which to iterate for placing lectures
+        self.daysList = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"]
 
     def map(self, teachers):                        # teachers: T3, T1, T2, T6, T4  (as an example)
         """Mapping is done on the basis matching the sequence of subjects and sequence of teachers provided as in the list.
@@ -21,18 +24,85 @@ class TimeTable:
            MCA-401 => T3, MCA-402 => T1, MCA-403 => T2, MCA-404 => T6, MCA-405 => T4 """
         pass
 
-    def place(self, teacher_to_place):
-        """This will select the 'freeSlots' of a teacher at a time. After that it will iterate on 'freeLectures' to place or
-           update its(freeLecture) value. Once 'freeLecture' gets updated, another teacher will get selected. The procedure goes on
-           until either all the subjects have enough lectures or teacher maximum lecture value is reached. Which teacher to select
-           could either be in sequence or could be random"""
-        pass
+    def place(self, teacher_to_place):   # teacher-subject mapping should be provided with teacher as keys
+        teacher_list = []
+        for value in teacher_to_place:
+            temp_name = str(value.keys())
+            name = temp_name[12:-3]  # only extracting the name from whole word from string "dict_keys([\\Name\\])"
+            teacher_list.append(name)
 
-    def random(self):
-        # picks teachers randomly
-        pass
+        while True:
+            # creating a matrix for [days*slots], rows represents days and columns represent slots
+            # it is a nested list of dictionaries in which every dictionary represent {teacher:subjects}
+            time_table = [[{} for _ in range(maximumSlots)] for _ in range(len(self.daysList))]
+            for slot in range(maximumSlots):
+                for day in range(len(time_table)):
+                    # randomly picking a teacher from the given mapping
+                    """teacher_to_place.keys() can be replaced with teacher_
+                       to_place only iff the argument teacher_to_place is a list"""
+                    selected_teacher = self.random(teacher_list)
+
+                    # checking if the randomly selected teacher is available for a particular slot or not
+                    if selected_teacher in get_teacher_availability_for_a_slot(self.daysList[day], slot + 1):
+                        for dictionary in teacher_to_place:
+                            if selected_teacher in dictionary:
+                                time_table[day][slot][selected_teacher] = dictionary[selected_teacher]
+                    else:
+                        time_table[day][slot]["not"] = "-"  # putting blank if selected teacher is unavailable for slot
+
+            """The output format is like 
+            row 1 -> Monday schedule
+            row 2 -> Tuesday schedule
+            row 3 -> Wednesday schedule.."""
+            for value in time_table:
+                print(value)
+                print()
+
+            """This following lines must be edited according to the semester or course for which time table is created
+            db[time_table_collection].insert({"course": "MCA",
+                                              "semester": "1",
+                                              "previous_one": time_table})"""
+
+            # taking input and asking for satisfaction : if yes : saved into database
+            value = int(input("\nAre you satisfied?\n1. Yes\n0.No\n"))
+            if value:
+                i = 0
+                for index in range(len(time_table)):
+                    for _ in range(len(time_table[index])):
+                        query = "empty_slots" + ".$[]." + str(self.daysList[i])
+                        slot_no = str(index + 1)
+                        # pulling out the empty_slots from respective teachers
+                        db[teacher_collection].find_one_and_update({"uid": str(time_table[index][i])},
+                                                                   {"$pull": {query: slot_no}})
+                        if i >= 4:
+                            i = 0
+                        else:
+                            i += 1
+                # saving the time_table in database for semester(semester, course can be changed), 
+                db[time_table_collection].find_one_and_update({"course": "MCA", "semester": "1"},
+                                                              {"$set": {"latest": time_table}})
+                break
+
+            else:
+                continue
+
+        _, uid, empty = fetch_empty_slots("MCA")
+        print(empty)
+        print(uid)
+        return time_table
+
+    def random(self, list_of_teachers):
+        global choice_taken
+        while True:
+            choice = random.choice(list_of_teachers)
+            if choice != choice_taken:
+                choice_taken = choice
+                return choice
+            else:
+                continue
 
 
+choice_taken = None
 # this function must be modified as it's definition isn't the supposed definition.
 # this function is supposed to be called before subject-teacher mapping and
 # its aim to find the no. of free slots of a teacher for teaching a subject per week.
@@ -58,9 +128,9 @@ def get_teacher_availability_for_a_slot(day, slot_to_check):
     free_teachers_for_slot = []
     # making a list of dictionaries available teachers and their respective uid for a slot on a day
     for value in cursor:
-        free_teachers_for_slot.append({value["name"]: value["uid"]})
+        free_teachers_for_slot.append(value["name"])  # can be changed to value["uid"] if uid is needed
 
-    print(free_teachers_for_slot)
+    # print(free_teachers_for_slot)
     return free_teachers_for_slot
 
 
@@ -70,3 +140,9 @@ def update_subjects_of_teachers(list_of_dictionaries):
         for key, values in list_of_dictionaries[index].items():
             db[teacher_collection].find_one_and_update({"uid": str(key)},
                                                        {"$set": {"subjects": values}})
+
+
+"""Example Usage"""
+# obj = TimeTable()
+# val0, val, val2 = fetch_empty_slots("MCA")
+# obj.place(val0)
