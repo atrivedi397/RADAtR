@@ -6,8 +6,11 @@ from Detached.Global.Configurations.ConnectionEstablishment import *
 
 # class for generating Time Table for a single batch
 class TimeTable:
-    def __init__(self):
-        self.batchNo = 0
+    def __init__(self, course, semester=None, batch=1, batch_timing=starting_time):
+        self.batchNo = batch                        # batch (could be alphanumeric, numeric, alphabetical)
+        self.batchTiming = batch_timing             # time at which the batch starts
+        self.course = course
+        self.semester = str(semester)                    # semester is stored into string format in the database
         self.totalSlots = maximumSlots              # decides till when the batch will go on
         self.lectures = []                          # contains the mappings of teachers and their subject
         """ format => [ {"teacher1" : "subject1"}, {"teacher2" : "subject2"} ]"""
@@ -54,15 +57,16 @@ class TimeTable:
             row 1 -> Monday schedule
             row 2 -> Tuesday schedule
             row 3 -> Wednesday schedule.."""
-            for value in time_table:
-                print(value)
-                print()
+            #for value in time_table:
+                #print(value)
+                #print()
 
             """This following lines must be edited according to the semester or course for which time table is created
             db[time_table_collection].insert({"course": "MCA",
                                               "semester": "1",
                                               "previous_one": time_table})"""
 
+            yield time_table
             # taking input and asking for satisfaction : if yes : saved into database
             value = int(input("\nAre you satisfied?\n1. Yes\n0.No\n"))
             if value:
@@ -78,18 +82,18 @@ class TimeTable:
                             i = 0
                         else:
                             i += 1
-                # saving the time_table in database for semester(semester, course can be changed), 
-                db[time_table_collection].find_one_and_update({"course": "MCA", "semester": "1"},
+                # saving the time_table in database for semester(semester, course can be changed),
+                """Inclusion of batch number and batch timings are yet to be sent and stored to database"""
+                db[time_table_collection].find_one_and_update({"course": self.course, "semester": self.semester},
                                                               {"$set": {"latest": time_table}})
                 break
 
             else:
                 continue
 
-        _, uid, empty = fetch_empty_slots("MCA")
+        _, uid, empty = fetch_empty_slots(self.course)
         print(empty)
         print(uid)
-        return time_table
 
     def random(self, list_of_teachers):
         global choice_taken
@@ -140,9 +144,3 @@ def update_subjects_of_teachers(list_of_dictionaries):
         for key, values in list_of_dictionaries[index].items():
             db[teacher_collection].find_one_and_update({"uid": str(key)},
                                                        {"$set": {"subjects": values}})
-
-
-"""Example Usage"""
-# obj = TimeTable()
-# val0, val, val2 = fetch_empty_slots("MCA")
-# obj.place(val0)

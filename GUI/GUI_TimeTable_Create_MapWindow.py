@@ -1,12 +1,14 @@
 from PyQt5.QtWidgets import *
 from Detached.Global.Functions.IndependentFunctions import get_list_of_subject_for
-from Detached.Classes.TimeTable import *
+from GUI.IndividualWidgets.GUI_TimeTable_Output import *
 
 
 class MapWindow:
     def __init__(self, parent=None, widget=None):
         # dependencies
         self.generateButton = widget               # refers to the 'Generate' button which is located in parent widget
+        self.course = None                         # to be fetched from the admin class
+        self.semester = None                       # will get updated by 'generate_time_table' function
         self.teachers = ["None", "Shared", "Manoj Kumar", "Narendra Kumar", "Sanjay Kumar Dwivedi", "Vipin Saxena", "Deepa Raj", "Shalini Chandra"]
         self.teacher_combo_boxes = []              # multiple comboBoxes are required to show dropDowns for each subject
         self.callingComboBoxIndex = None           # to identify which combo Box sent the signal or assigned a value
@@ -14,6 +16,7 @@ class MapWindow:
         self.windowOpened = False                  # used as a flag to know if 'share teacher' window is open or not
         self.sharingMade = False                   # used as a flag to know if sharing is made or not
         self.sharedList = []                       # contains subject-name along with names of teachers who shares it
+        self.mapped_shared_subjects_index = []     # index numbers (of subjects) for which shared mapping has been done
         self.mapped_subjects_index = []            # index numbers (of subjects) for which mapping has been done
         self.teachersSelectedForSharing = 0        # counter, responsible for enabling/disabling 'share' button
         self.sharedTeachers = []                   # list of teachers which are selected to share same subject
@@ -59,7 +62,27 @@ class MapWindow:
         index_of_teacher = self.teacher_combo_boxes[index].currentIndex()
 
         if value == 'None':
-            pass
+            mapping_already_removed = False
+
+            # looking for the subject index if it exists already in shared-mapped list
+            for i in self.mapped_shared_subjects_index:
+                if i == index:                                          # means (shared) mapping exists
+                    self.remove_shared_mapping(i)                       # remove existing mapping (from sharedList)
+                    mapping_already_removed = True
+
+            if not mapping_already_removed:                             # means (dedicated) mapping exists
+                self.remove_mapping(index)                              # remove existing mapping (from finalList)
+
+            # test outputs
+            # for i in self.sharedList:
+            #     print(i)
+            # print(f'Shared Indexes mapped: {self.mapped_shared_subjects_index}')
+            # print()
+            # print('Final List is as follow:')
+            # for i in self.finalList:
+            #     print(i)
+            # print(f'Indexes mapped: {self.mapped_subjects_index}')
+            # print()
 
         elif value == 'Shared':
             # showing vertical line (to separate 2 sub windows)
@@ -115,8 +138,20 @@ class MapWindow:
             # generating single mappings and updating finalList
             self.teacher_to_subjects_map(teacher_name, subject_name, index)
 
+            # test outputs
+            # print('Shared List is as follow:')
+            # for i in self.sharedList:
+            #     print(i)
+            # print(f'Shared Indexes mapped: {self.mapped_shared_subjects_index}')
+            # print()
+            # print('Final List is as follow:')
+            # for i in self.finalList:
+            #     print(i)
+            # print(f'Indexes mapped: {self.mapped_subjects_index}')
+            # print()
+
         # enable 'Generate' button only when total mappings are equals to number of subjects
-        total_mappings = len(self.mapped_subjects_index)
+        total_mappings = len(self.mapped_subjects_index) + len(self.mapped_shared_subjects_index)
         if total_mappings == len(self.subjectList):
             self.generateButton.setEnabled(True)
         else:
@@ -130,15 +165,18 @@ class MapWindow:
         return teacher_options_widget
 
     def display_mapping_options(self, for_semester):
+        # updating semester value which will be passed to 'TimeTable' via 'generate_time_table' function
+        self.semester = for_semester
+
         prompt = QLabel('Please assign the following subjects with their respective lecturer')
         prompt.setContentsMargins(0, 0, 0, 20)
         self.mapArea.addWidget(prompt)
 
-        course = "MCA"                                      # This value is dependent on the Admin attribute
+        self.course = "MCA"                                      # This value is dependent on the Admin attribute
         semester = for_semester                             # getting semester number
 
         # getting list of subjects for the desired course and semester
-        self.subjectList = get_list_of_subject_for(course, semester)
+        self.subjectList = get_list_of_subject_for(self.course, semester)
 
         self.teacher_combo_boxes = []                       # resetting list to be empty
         # creating list of comboBoxes with having same dropDown items
@@ -150,6 +188,10 @@ class MapWindow:
 
     # function to close/hide dynamic content (teacher and subject lists)
     def close_map_window(self):
+        # resetting values
+        self.finalList = []
+        self.mapped_subjects_index = []                             # decides enabling/disabling of 'Generate' button
+
         # external code to empty the (dynamic layout)
         while self.mapArea.count() > 0:
             item = self.mapArea.takeAt(0)
@@ -171,10 +213,6 @@ class MapWindow:
         self.teachersSelectedForSharing = 0
         self.sharedTeachers = []
         self.sharedSubjectIndex = None
-        self.mapped_subjects_index = []
-        self.finalList = []
-        self.sharedSubjectIndex = None
-        self.generateButton.setEnabled(False)
 
         # setting 'None' in lieu of 'Shared' if cancel button is pressed
         if self.windowOpened:
@@ -259,13 +297,17 @@ class MapWindow:
         subject = self.subjectList[self.sharedSubjectIndex]
         mapping = {subject: self.sharedTeachers}
 
+        # removing dedicated mapping if exists in final list
+        for index in self.mapped_subjects_index:
+            if index == self.sharedSubjectIndex:
+                self.remove_mapping(index)
+
         # update the value (ie teacher names) if mapping for the same subject already exists
-        if len(self.sharedList) > 0:  # means some mappings exist
+        if len(self.sharedList) > 0:                                    # means some mappings exist
             subject_match_found = False
             for each_dictionary in self.sharedList:
                 for key, values in each_dictionary.items():
                     if subject == key:
-                        print('updating existing value')
                         each_dictionary[key] = self.sharedTeachers      # updating the teacher names for the subject
                         subject_match_found = True
                         break
@@ -273,34 +315,63 @@ class MapWindow:
                 if subject_match_found:
                     break                                               # stop looking for the subject
                 else:                                                   # if mapping for the subject doesn't exists
-                    print('creating new mapping')
+                    # print('creating new mapping')
                     self.sharedList.append(mapping)                     # append the new mapping
+                    self.mapped_shared_subjects_index.append(self.sharedSubjectIndex)
                     break
 
-        else:  # if no mapping exists
-            print('creating first mapping...')
+        else:                                                           # if no mapping exists
             self.sharedList.append(mapping)
+            self.mapped_shared_subjects_index.append(self.sharedSubjectIndex)
 
         # updating the flag to refer sharing is made
         self.sharingMade = True
 
         # test output
-        for i in self.sharedList:
-            print(i)
-        print()
+        # print('Shared List is as follow:')
+        # for i in self.sharedList:
+        #     print(i)
+        # print(f'Shared Indexes: {self.mapped_shared_subjects_index}')
+        # print()
+        # print('Final List is as follow:')
+        # for i in self.finalList:
+        #     print(i)
+        # print(f'Indexes mapped: {self.mapped_subjects_index}')
+        # print()
 
         # closing the shared window after done processing
         self.close_sharing_section()
+
+    # function to remove subject-teachers mapping from shared list, for which a dedicated teacher mapping has been done
+    def remove_shared_mapping(self, mapping_index):
+        for mapping in self.sharedList:
+            for subject, teachers in mapping.items():
+                if subject == self.subjectList[mapping_index]:
+                    self.sharedList.remove(mapping)
+                    self.mapped_shared_subjects_index.remove(mapping_index)
+
+    # function to remove teacher-subjects mapping, for which a shared mapping has been made
+    def remove_mapping(self, mapping_index):
+        for each_mapping in self.finalList:
+            for teacher, subjects in each_mapping.items():
+                for subject in subjects:
+                    if subject == self.subjectList[mapping_index]:
+                        self.finalList.remove(each_mapping)
+                        self.mapped_subjects_index.remove(mapping_index)
 
     def teacher_to_subjects_map(self, teacher_name, subject_name, index):
         exists_subject_mapping = False
         teacher_to_replace = None
         found_subject = False
 
-        # checking if a mapping for given subject already exists
+        # checking if a mapping for given subject already exists (in shared mapping list). If exists, delete the mapping
+        for i in self.mapped_shared_subjects_index:
+            if i == index:
+                self.remove_shared_mapping(index)
+
+        # checking if a mapping for given subject already exists (in dedicated mapping list)
         for i in self.mapped_subjects_index:
             if i == index:
-                print('Mapping Exists for the given subject')
                 exists_subject_mapping = True
 
         if exists_subject_mapping:
@@ -326,20 +397,17 @@ class MapWindow:
             self.finalList.append(new_mapping)                      # appending it to list
 
         else:
-            print('No mapping for this subject')
             found_teacher_match = False
             mapping = {teacher_name: [subject_name]}                # creating mapping in form of dictionary
 
             if len(self.finalList) == 0:                            # when no 1 to 1 mapping is made
                 self.finalList.append(mapping)                      # appending the mapping into final list
                 self.mapped_subjects_index.append(index)
-                print('first mapping...')
 
             else:                                                   # if some 1 to 1 mapping exists already
                 for each_mapping in self.finalList:
                     for key, value in each_mapping.items():
                         if teacher_name == key:                     # if teacher is already teaching a subject
-                            print('updating mapping...')
                             each_mapping[key].append(subject_name)  # append another subject
                             self.mapped_subjects_index.append(index)
                             found_teacher_match = True
@@ -348,15 +416,8 @@ class MapWindow:
                         break                                       # stop looking for teacher in finalList
 
                 if not found_teacher_match:
-                    print('adding new mapping')
                     self.finalList.append(mapping)                  # add a new mapping in finalList
                     self.mapped_subjects_index.append(index)
-
-            # test output
-            for i in self.finalList:
-                print(i)
-            print(self.mapped_subjects_index)
-            print()
 
     # helper function used when converting subject-teacher mapping to teacher-subject mapping
     def get_index_for_subject(self, subject_name):
@@ -365,7 +426,7 @@ class MapWindow:
                 return i                                            # i is an index
 
     # generating time table after all required mappings are made
-    def generate_time_table(self):
+    def generate_time_table(self, batch, timing):
         # converting subject-teachers mapping into subject-teacher mappings
         for each_mapping in self.sharedList:
             for subject, teachers in each_mapping.items():
@@ -373,11 +434,10 @@ class MapWindow:
                 for teacher in teachers:
                     self.teacher_to_subjects_map(teacher, subject, sub_index)
 
-        # test output
-        for i in self.finalList:
-            print(i)
-        print()
+        # calling time-table output class
+        self.show_time_table(batch, timing)
 
-        # creating timeTable object
-        obj = TimeTable()
-        obj.place(self.finalList)
+    # calling another widget/window which displays the time-table
+    def show_time_table(self, batch, timing):
+        self.output = TimeTableDisplayWindow(None, self.finalList, self.course, self.semester, batch, timing)
+        self.output.show()

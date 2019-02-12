@@ -21,7 +21,7 @@ class TimeTableWindow:
         # input fields of the window
         self.semesterField = QComboBox(self.createTimeTableWindow)      # for semester no. input
         self.semesterField.addItems(self.semesterList)                  # list values must be passed
-        self.semesterField.currentIndexChanged.connect(self.test_function)
+        self.semesterField.currentIndexChanged.connect(self.show_mapping_options)
         self.semesterField.setFixedWidth(60)
         self.batchField = QLineEdit()                                   # for batch input
         self.batchField.setFixedWidth(60)
@@ -96,7 +96,8 @@ class TimeTableWindow:
         # self.createTimeTableWindow.setLayout(self.fourSections)
 
     # shows the subject and teacher list only if it's not already created or regenerates it
-    def test_function(self):
+    def show_mapping_options(self):
+        self.generateButton.setEnabled(False)
         if self.semesterField.currentText() == '-':                     # if no semester is chosen,
             self.empty_third_section()                                  # close the mapping list (if already created)
         elif not self.alreadyCreated:
@@ -132,10 +133,13 @@ class TimeTableWindow:
 
     # function called on click of 'Generate' button
     def process_generate_button(self):
-        self.mapSubWinClass.generate_time_table()
+        batch_no = self.batchField.text()
+        batch_timing = self.timingField.text()
+        self.mapSubWinClass.generate_time_table(batch_no, batch_timing)
 
     # to close entire 'create Time Table' window
     def close_create_window(self):
+        self.generateButton.setEnabled(False)
         self.mapSubWinClass.close_map_window()
         del self.mapSubWinClass
         self.mapSubWinClass = MapWindow(self.parent)

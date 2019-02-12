@@ -1,6 +1,6 @@
 # -------- values decided by governing authority -----
 totalWorkingDays = 5
-maximumSlots = 7                    # maximum possibility of total lectures in a day
+maximumSlots = 6                    # maximum possibility of total lectures in a day
 
 starting_time = 1000
 duration = 60                       # in minutes
