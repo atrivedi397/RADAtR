@@ -97,13 +97,17 @@ class TimeTable:
 
     def random(self, list_of_teachers):
         global choice_taken
-        while True:
-            choice = random.choice(list_of_teachers)
-            if choice != choice_taken:
-                choice_taken = choice
-                return choice
-            else:
-                continue
+        # returning the same value if only one mapping is present
+        if len(list_of_teachers) == 1:
+            return random.choice(list_of_teachers)
+        else:
+            while True:
+                choice = random.choice(list_of_teachers)
+                if choice != choice_taken:
+                    choice_taken = choice
+                    return choice
+                else:
+                    continue
 
 
 choice_taken = None
