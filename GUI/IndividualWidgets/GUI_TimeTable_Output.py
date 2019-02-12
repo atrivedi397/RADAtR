@@ -32,6 +32,7 @@ class TimeTableDisplayWindow(QMainWindow):
 
         # creating an object of 'TimeTable' class to generate time table
         self.time_table = TimeTable(self.course, self.semester, self.batchNo, self.baseTime)
+        self.assign_mappings()
 
         self.setWindowTitle(self.title)
         self.setFixedSize(938, 480)
@@ -106,6 +107,13 @@ class TimeTableDisplayWindow(QMainWindow):
 
     def assign_mappings(self):
         mapping_list = self.time_table.place(self.listOfSlots)
+
+        # testing value
+        for each_list in mapping_list:
+            for each_dictionary in each_list:
+                print(each_dictionary, "\n")
+
+        # plotting lectures in different slots
 
 #
 # def main():

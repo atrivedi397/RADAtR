@@ -57,15 +57,16 @@ class TimeTable:
             row 1 -> Monday schedule
             row 2 -> Tuesday schedule
             row 3 -> Wednesday schedule.."""
-            for value in time_table:
-                print(value)
-                print()
+            #for value in time_table:
+                #print(value)
+                #print()
 
             """This following lines must be edited according to the semester or course for which time table is created
             db[time_table_collection].insert({"course": "MCA",
                                               "semester": "1",
                                               "previous_one": time_table})"""
 
+            yield time_table
             # taking input and asking for satisfaction : if yes : saved into database
             value = int(input("\nAre you satisfied?\n1. Yes\n0.No\n"))
             if value:
@@ -93,7 +94,6 @@ class TimeTable:
         _, uid, empty = fetch_empty_slots(self.course)
         print(empty)
         print(uid)
-        return time_table
 
     def random(self, list_of_teachers):
         global choice_taken

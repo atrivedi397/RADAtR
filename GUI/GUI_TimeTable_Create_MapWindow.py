@@ -151,7 +151,7 @@ class MapWindow:
             # print()
 
         # enable 'Generate' button only when total mappings are equals to number of subjects
-        total_mappings = len(self.mapped_subjects_index)
+        total_mappings = len(self.mapped_subjects_index) + len(self.mapped_shared_subjects_index)
         if total_mappings == len(self.subjectList):
             self.generateButton.setEnabled(True)
         else:
