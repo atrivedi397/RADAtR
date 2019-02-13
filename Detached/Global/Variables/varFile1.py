@@ -6,7 +6,7 @@ starting_time = 1000
 duration = 60                       # in minutes
 lunch_slot_no = 4
 
-
+time_table_generation_limit = 5
 # -------- teacher oriented variables --------------
 # Professors Ranks
 professor = "Professor"

@@ -3,6 +3,7 @@ import random
 from Detached.Global.Variables.varFile1 import *
 from Detached.Global.Configurations.ConnectionEstablishment import *
 
+prev_time_tables = []
 
 # class for generating Time Table for a single batch
 class TimeTable:
@@ -28,82 +29,91 @@ class TimeTable:
         pass
 
     def place(self, teacher_to_place):   # teacher-subject mapping should be provided with teacher as keys
-        teacher_list = []
-        for value in teacher_to_place:
-            temp_name = str(value.keys())
-            name = temp_name[12:-3]  # only extracting the name from whole word from string "dict_keys([\\Name\\])"
-            teacher_list.append(name)
 
-        while True:
-            # creating a matrix for [days*slots], rows represents days and columns represent slots
-            # it is a nested list of dictionaries in which every dictionary represent {teacher:subjects}
-            time_table = [[{} for _ in range(maximumSlots)] for _ in range(len(self.daysList))]
-            for slot in range(maximumSlots):
-                for day in range(len(time_table)):
-                    # randomly picking a teacher from the given mapping
-                    """teacher_to_place.keys() can be replaced with teacher_
-                       to_place only iff the argument teacher_to_place is a list"""
-                    selected_teacher = self.random(teacher_list)
+        """Checking and returning the last value if the limit of time table generation is reached"""
+        if len(prev_time_tables) >= time_table_generation_limit:
+            print(f"You cannot generate more than {time_table_generation_limit} time tables,"
+                  f" so returning the last generated.")
+            for day in prev_time_tables[-1]:
+                print(day, "\n")
+            return prev_time_tables[-1]
 
-                    # checking if the randomly selected teacher is available for a particular slot or not
-                    if selected_teacher in get_teacher_availability_for_a_slot(self.daysList[day], slot + 1):
-                        for dictionary in teacher_to_place:
-                            if selected_teacher in dictionary:
-                                time_table[day][slot][selected_teacher] = dictionary[selected_teacher]
-                    else:
-                        time_table[day][slot]["not"] = "-"  # putting blank if selected teacher is unavailable for slot
+        # Else generating a new time table under the limit of time table generation
+        else:
+            teacher_list = []
+            for value in teacher_to_place:
+                temp_name = str(value.keys())
+                name = temp_name[12:-3]  # only extracting the name from whole word from string "dict_keys([\\Name\\])"
+                teacher_list.append(name)
 
-            """The output format is like 
-            row 1 -> Monday schedule
-            row 2 -> Tuesday schedule
-            row 3 -> Wednesday schedule.."""
-            #for value in time_table:
-                #print(value)
-                #print()
+            while True:
+                # creating a matrix for [days*slots], rows represents days and columns represent slots
+                # it is a nested list of dictionaries in which every dictionary represent {teacher:subjects}
+                time_table = [[{} for _ in range(maximumSlots)] for _ in range(len(self.daysList))]
+                for slot in range(maximumSlots):
+                    for day in range(len(time_table)):
+                        # randomly picking a teacher from the given mapping
+                        """teacher_to_place.keys() can be replaced with teacher_
+                           to_place only iff the argument teacher_to_place is a list"""
+                        selected_teacher = self.random(teacher_list)
 
-            """This following lines must be edited according to the semester or course for which time table is created
-            db[time_table_collection].insert({"course": "MCA",
-                                              "semester": "1",
-                                              "previous_one": time_table})"""
-
-            yield time_table
-            # taking input and asking for satisfaction : if yes : saved into database
-            value = int(input("\nAre you satisfied?\n1. Yes\n0.No\n"))
-            if value:
-                i = 0
-                for index in range(len(time_table)):
-                    for _ in range(len(time_table[index])):
-                        query = "empty_slots" + ".$[]." + str(self.daysList[i])
-                        slot_no = str(index + 1)
-                        # pulling out the empty_slots from respective teachers
-                        db[teacher_collection].find_one_and_update({"uid": str(time_table[index][i])},
-                                                                   {"$pull": {query: slot_no}})
-                        if i >= 4:
-                            i = 0
+                        # checking if the randomly selected teacher is available for a particular slot or not
+                        if selected_teacher in get_teacher_availability_for_a_slot(self.daysList[day], slot + 1):
+                            for dictionary in teacher_to_place:
+                                if selected_teacher in dictionary:
+                                    # actual placing of teacher-subject mapping
+                                    time_table[day][slot][selected_teacher] = dictionary[selected_teacher]
                         else:
-                            i += 1
-                # saving the time_table in database for semester(semester, course can be changed),
-                """Inclusion of batch number and batch timings are yet to be sent and stored to database"""
-                db[time_table_collection].find_one_and_update({"course": self.course, "semester": self.semester},
-                                                              {"$set": {"latest": time_table}})
-                break
+                            time_table[day][slot]["not"] = "-"  # putting blank if selected teacher is not free for slot
 
-            else:
-                continue
+                # appending the new random time table if it was not already generated one
+                if time_table not in prev_time_tables:
+                    prev_time_tables.append(time_table)
+                    print(f"You have created {len(prev_time_tables)} time tables.")
+                    for day in time_table:
+                        print(day, "\n")
+                    return prev_time_tables[-1]
+                # if only one teacher-subject mapping given(6 sem MCA), then saving from infinite loop.
+                elif len(teacher_to_place) == 1:
+                    for day in time_table:
+                        print(day, "\n")
+                    return prev_time_tables[-1]
+                # else continuing with next unique generation
+                else:
+                    continue
 
-        _, uid, empty = fetch_empty_slots(self.course)
-        print(empty)
-        print(uid)
+    def store_time_table_in_db(self):
+        i = 0
+        for index in range(len(prev_time_tables[-1])):
+            for _ in range(len(prev_time_tables[-1][index])):
+                query = "empty_slots" + ".$[]." + str(self.daysList[i])
+                slot_no = str(index + 1)
+                # pulling out the empty_slots from respective teachers
+                db[teacher_collection].find_one_and_update({"uid": str(prev_time_tables[-1][index][i])},
+                                                           {"$pull": {query: slot_no}})
+                if i >= 4:
+                    i = 0
+                else:
+                    i += 1
+        # saving the time_table in database for semester(semester, course can be changed),
+        """Inclusion of batch number and batch timings are yet to be sent and stored to database"""
+        db[time_table_collection].find_one_and_update({"course": self.course, "semester": self.semester},
+                                                      {"$set": {"latest": prev_time_tables[-1]}})
 
-    def random(self, list_of_teachers):
+    @staticmethod
+    def random(list_of_teachers):
         global choice_taken
-        while True:
-            choice = random.choice(list_of_teachers)
-            if choice != choice_taken:
-                choice_taken = choice
-                return choice
-            else:
-                continue
+        # returning the same value if only one mapping is present
+        if len(list_of_teachers) == 1:
+            return random.choice(list_of_teachers)
+        else:
+            while True:
+                choice = random.choice(list_of_teachers)
+                if choice != choice_taken:
+                    choice_taken = choice
+                    return choice
+                else:
+                    continue
 
 
 choice_taken = None
