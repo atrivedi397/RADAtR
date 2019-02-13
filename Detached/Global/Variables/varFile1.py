@@ -5,6 +5,7 @@ maximumSlots = 6                    # maximum possibility of total lectures in a
 starting_time = 1000
 duration = 60                       # in minutes
 lunch_slot_no = 4
+days_list = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"]
 
 
 # -------- teacher oriented variables --------------

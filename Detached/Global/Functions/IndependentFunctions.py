@@ -76,6 +76,8 @@ def get_list_of_subject_for(course, semester):
 
 # function to add minutes to given time and return the result in 24-hour format
 def add_time_to(initial_time, minutes_to_add):
+    initial_time = str(initial_time)
+    minutes_to_add = str(minutes_to_add)
     # validation of arguments
     if minutes_to_add[0] == '-':
         print('Cannot add negative values')

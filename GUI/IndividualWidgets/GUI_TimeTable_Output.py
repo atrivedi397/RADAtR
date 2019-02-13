@@ -2,6 +2,7 @@ import sys
 from PyQt5.QtWidgets import *
 from Detached.Global.Functions.IndependentFunctions import add_time_to
 from Detached.Classes.TimeTable import *
+from testFile1 import test_list
 
 
 class TimeTableDisplayWindow(QMainWindow):
@@ -32,7 +33,6 @@ class TimeTableDisplayWindow(QMainWindow):
 
         # creating an object of 'TimeTable' class to generate time table
         self.time_table = TimeTable(self.course, self.semester, self.batchNo, self.baseTime)
-        self.assign_mappings()
 
         self.setWindowTitle(self.title)
         self.setFixedSize(938, 480)
@@ -67,7 +67,7 @@ class TimeTableDisplayWindow(QMainWindow):
 
         # creating ('Next', 'Finalize' and 'Cancel') buttons
         next_button = QPushButton('Next')
-        next_button.clicked.connect(lambda: self.assign_mappings())
+        # next_button.clicked.connect(lambda: self.assign_mappings())
         finalize_button = QPushButton('Finalize')
         cancel_button = QPushButton('Cancel')
 
@@ -81,6 +81,7 @@ class TimeTableDisplayWindow(QMainWindow):
         self.layout.addWidget(self.tableWidget)
         self.layout.addLayout(self.buttons_layout)
         self.containerWidget.setLayout(self.layout)
+        self.assign_mappings()
 
     def get_next_slot(self, for_n_slots):
         for i in range(for_n_slots):
@@ -88,10 +89,11 @@ class TimeTableDisplayWindow(QMainWindow):
             if i == lunch_slot_no - 1:                      # as lunch_slot_no isn't index
                 next_slot_time = add_time_to(self.baseTime, self.slotDuration)
                 self.baseTime = next_slot_time
-                self.slots.append('')
+                self.slots.append('')                       # print no label for lunch slots
             else:
                 # storing slot starting time
                 start = self.baseTime
+                start = str(start)
 
                 # batch timing validations
                 if start == '':
@@ -109,20 +111,25 @@ class TimeTableDisplayWindow(QMainWindow):
         mapping_list = self.time_table.place(self.listOfSlots)
 
         # testing value
-        for each_list in mapping_list:
-            for each_dictionary in each_list:
-                print(each_dictionary, "\n")
+        for day in range(len(mapping_list)):
+            for lecture in range(len(mapping_list[day])):
+                if lecture == lunch_slot_no - 1:
+                    self.tableWidget.setItem(day, lecture, QTableWidgetItem(''))
+                else:
+                    for teacher, subject in mapping_list[day][lecture].items():
+                        slot_label = subject[0] + '\n' + teacher
+                        self.tableWidget.setItem(day, lecture, QTableWidgetItem(slot_label))
 
         # plotting lectures in different slots
 
-#
-# def main():
-#     ObjQApplication = QApplication(sys.argv)
-#     ObjQApplication.setStyle('Fusion')
-#     Objtimetable = Timetable()
-#     Objtimetable.show()
-#     sys.exit(ObjQApplication.exec_())
-#
-#
-# if __name__ == '__main__':
-#     main()
+
+def main():
+    ObjQApplication = QApplication(sys.argv)
+    ObjQApplication.setStyle('Fusion')
+    Objtimetable = TimeTableDisplayWindow()
+    Objtimetable.show()
+    sys.exit(ObjQApplication.exec_())
+
+
+if __name__ == '__main__':
+    main()
