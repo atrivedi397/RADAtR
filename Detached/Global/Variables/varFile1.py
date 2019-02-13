@@ -7,7 +7,7 @@ duration = 60                       # in minutes
 lunch_slot_no = 4
 days_list = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"]
 
-
+time_table_generation_limit = 5
 # -------- teacher oriented variables --------------
 # Professors Ranks
 professor = "Professor"
