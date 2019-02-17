@@ -2,6 +2,7 @@ import sys
 from PyQt5.QtWidgets import *
 from Detached.Global.Functions.IndependentFunctions import add_time_to
 from Detached.Classes.TimeTable import *
+from testFile1 import test_list
 
 
 class TimeTableDisplayWindow(QMainWindow):
@@ -17,6 +18,7 @@ class TimeTableDisplayWindow(QMainWindow):
         self.slotDuration = '60'
         self.slots = []
         self.listOfSlots = slots_list
+        self.timeTableGenerated = 0
 
         # batch timing validations
         if self.baseTime == '':
@@ -32,7 +34,6 @@ class TimeTableDisplayWindow(QMainWindow):
 
         # creating an object of 'TimeTable' class to generate time table
         self.time_table = TimeTable(self.course, self.semester, self.batchNo, self.baseTime)
-        self.assign_mappings()
 
         self.setWindowTitle(self.title)
         self.setFixedSize(938, 480)
@@ -66,14 +67,15 @@ class TimeTableDisplayWindow(QMainWindow):
         self.buttons_layout = QHBoxLayout(self.containerWidget)
 
         # creating ('Next', 'Finalize' and 'Cancel') buttons
-        next_button = QPushButton('Next')
-        next_button.clicked.connect(lambda: self.assign_mappings())
+        self.next_button = QPushButton('Next')
+        self.next_button.clicked.connect(lambda: self.assign_mappings())
         finalize_button = QPushButton('Finalize')
+        finalize_button.clicked.connect(self.finalize_time_table)
         cancel_button = QPushButton('Cancel')
 
         # adding buttons in a line (horizontally)
         self.buttons_layout.addStretch(2)  # creates empty space on the left side
-        self.buttons_layout.addWidget(next_button)
+        self.buttons_layout.addWidget(self.next_button)
         self.buttons_layout.addWidget(finalize_button)
         self.buttons_layout.addWidget(cancel_button)
 
@@ -81,6 +83,7 @@ class TimeTableDisplayWindow(QMainWindow):
         self.layout.addWidget(self.tableWidget)
         self.layout.addLayout(self.buttons_layout)
         self.containerWidget.setLayout(self.layout)
+        self.assign_mappings()
 
     def get_next_slot(self, for_n_slots):
         for i in range(for_n_slots):
@@ -88,10 +91,11 @@ class TimeTableDisplayWindow(QMainWindow):
             if i == lunch_slot_no - 1:                      # as lunch_slot_no isn't index
                 next_slot_time = add_time_to(self.baseTime, self.slotDuration)
                 self.baseTime = next_slot_time
-                self.slots.append('')
+                self.slots.append('')                       # print no label for lunch slots
             else:
                 # storing slot starting time
                 start = self.baseTime
+                start = str(start)
 
                 # batch timing validations
                 if start == '':
@@ -106,23 +110,41 @@ class TimeTableDisplayWindow(QMainWindow):
                 self.slots.append(column_label)
 
     def assign_mappings(self):
-        mapping_list = self.time_table.place(self.listOfSlots)
+        if self.timeTableGenerated < 5 - 1:
+            mapping_list = self.time_table.place(self.listOfSlots)
 
-        # testing value
-        for each_list in mapping_list:
-            for each_dictionary in each_list:
-                print(each_dictionary, "\n")
+            day_number = 0
+            lunch = 'LUNCH'
 
-        # plotting lectures in different slots
+            # plotting lectures in different slots
+            for day in mapping_list:
+                slot_number = 0
+                for lecture in day:
+                    for teacher, subject in lecture.items():
+                        if slot_number == lunch_slot_no - 1:
+                            self.tableWidget.setItem(day_number, slot_number, QTableWidgetItem(lunch[day_number]))
+                            slot_number += 1
+                        else:
+                            slot_label = subject[0] + '\n' + teacher
+                            self.tableWidget.setItem(day_number, slot_number, QTableWidgetItem(slot_label))
+                            slot_number += 1
+                day_number += 1
+            self.timeTableGenerated += 1
+        else:
+            self.next_button.setEnabled(False)
 
-#
-# def main():
-#     ObjQApplication = QApplication(sys.argv)
-#     ObjQApplication.setStyle('Fusion')
-#     Objtimetable = Timetable()
-#     Objtimetable.show()
-#     sys.exit(ObjQApplication.exec_())
-#
-#
-# if __name__ == '__main__':
-#     main()
+    # function that is to be performed on clicking 'Finalize' button
+    def finalize_time_table(self):
+        self.time_table.store_time_table_in_db()
+
+
+def main():
+    ObjQApplication = QApplication(sys.argv)
+    ObjQApplication.setStyle('Fusion')
+    Objtimetable = TimeTableDisplayWindow()
+    Objtimetable.show()
+    sys.exit(ObjQApplication.exec_())
+
+
+if __name__ == '__main__':
+    main()
