@@ -1,5 +1,5 @@
 import sys
-from GUI.GUI_ModulePanel import *
+from GUI_ModulePanel import *
 from GUI.GUI_NavigationPanel import *
 from GUI.GUI_TimeTable_Create import *
 
