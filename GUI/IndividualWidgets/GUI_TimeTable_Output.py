@@ -12,7 +12,7 @@ class TimeTableDisplayWindow(QMainWindow):
         self.title = 'Time Table'
         self.course = course
         self.semester = semester
-        self.days_list = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"]
+        self.session = '2018-2019'                      # static value for now, must be updated
         self.batchNo = batch_no
         self.baseTime = starting_time
         self.slotDuration = '60'
@@ -45,7 +45,27 @@ class TimeTableDisplayWindow(QMainWindow):
 
         # Add box layout
         self.layout = QVBoxLayout(self.containerWidget)
+        self.infoRow = QHBoxLayout(self.containerWidget)
         self.tableWidget = QTableWidget(self.containerWidget)
+        
+        # first row layout which shows Course, Batch, Year and Semester info
+        course_label = 'Course: ' + self.course
+        self.course_info = QLabel(course_label)
+        
+        semester_label = 'Semester: ' + str(self.semester)
+        self.semester_info = QLabel(semester_label)
+        
+        batch_label = 'Batch: ' + self.batchNo
+        self.batch_info = QLabel(batch_label)
+        
+        session_label = 'Year: ' + self.session
+        self.session_info = QLabel(session_label)
+
+        # stacking up all of the above widget horizontally
+        self.infoRow.addWidget(self.course_info)
+        self.infoRow.addWidget(self.semester_info)
+        self.infoRow.addWidget(self.batch_info)
+        self.infoRow.addWidget(self.session_info)
 
         # rows creation and its properties
         self.tableWidget.setRowCount(totalWorkingDays)
@@ -60,7 +80,7 @@ class TimeTableDisplayWindow(QMainWindow):
             else:
                 self.tableWidget.setColumnWidth(column_no, 130)
 
-        self.tableWidget.setVerticalHeaderLabels(self.days_list)
+        self.tableWidget.setVerticalHeaderLabels(days_list)
         self.get_next_slot(maximumSlots+1)
         self.tableWidget.setHorizontalHeaderLabels(self.slots)
 
@@ -80,7 +100,8 @@ class TimeTableDisplayWindow(QMainWindow):
         self.buttons_layout.addWidget(finalize_button)
         self.buttons_layout.addWidget(cancel_button)
 
-        # add table to box layout and add box layout to widget
+        # adding table widget and 'info_row' layout to box layout and add box layout to widget
+        self.layout.addLayout(self.infoRow)
         self.layout.addWidget(self.tableWidget)
         self.layout.addLayout(self.buttons_layout)
         self.containerWidget.setLayout(self.layout)
