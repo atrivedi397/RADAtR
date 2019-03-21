@@ -2,7 +2,6 @@ import sys
 from PyQt5.QtWidgets import *
 from Detached.Global.Functions.IndependentFunctions import add_time_to, last_name_only
 from Detached.Classes.TimeTable import *
-# from testFile1 import test_list
 
 
 class TimeTableDisplayWindow(QMainWindow):
@@ -14,18 +13,18 @@ class TimeTableDisplayWindow(QMainWindow):
         self.semester = semester
         self.session = '2018-2019'                      # static value for now, must be updated
         self.batchNo = batch_no
-        self.baseTime = starting_time
+        self.baseTime = batch_timing
         self.slotDuration = '60'
         self.slots = []
         self.listOfSlots = slots_list
-        self.timeTableGenerated = 1
+        self.timeTableGenerated = 0
         self.timeTableMaxGenerationLimit = 5
 
         # batch timing validations
         if self.baseTime == '':
             self.baseTime = str(starting_time)
         else:
-            self.baseTime = batch_timing
+            self.baseTime = str(batch_timing)
 
         # batch number validation
         if self.batchNo == '':
@@ -87,7 +86,10 @@ class TimeTableDisplayWindow(QMainWindow):
         # creating buttons area
         self.buttons_layout = QHBoxLayout(self.containerWidget)
 
-        # creating ('Next', 'Finalize' and 'Cancel') buttons
+        # creating ('Print', 'Previous', 'Next', 'Finalize' and 'Cancel') buttons
+        print_button = QPushButton('Print')
+        previous_button = QPushButton('Previous')
+        previous_button.clicked.connect(self.show_previous_time_table)
         self.next_button = QPushButton('Next')
         self.next_button.clicked.connect(lambda: self.assign_mappings())
         finalize_button = QPushButton('Finalize')
@@ -95,7 +97,9 @@ class TimeTableDisplayWindow(QMainWindow):
         cancel_button = QPushButton('Cancel')
 
         # adding buttons in a line (horizontally)
-        self.buttons_layout.addStretch(2)  # creates empty space on the left side
+        self.buttons_layout.addStretch()  # creates empty space on the left side
+        self.buttons_layout.addWidget(print_button)
+        self.buttons_layout.addWidget(previous_button)
         self.buttons_layout.addWidget(self.next_button)
         self.buttons_layout.addWidget(finalize_button)
         self.buttons_layout.addWidget(cancel_button)
@@ -129,12 +133,12 @@ class TimeTableDisplayWindow(QMainWindow):
                 self.baseTime = end
 
                 # creating label for slots
-                column_label = start + '-' + end
+                column_label = start[0:2] + ':' + start[2:4] + '-' + end[0:2] + ':' + end[2:4]
                 self.slots.append(column_label)
 
     # function to assign 'Subject-teacher' mapping to each slot of each week.
     def assign_mappings(self):
-        if self.timeTableGenerated <= self.timeTableMaxGenerationLimit:
+        if self.timeTableGenerated < self.timeTableMaxGenerationLimit:
             mapping_list = self.time_table.place(self.listOfSlots)
 
             day_number = 0
@@ -155,6 +159,7 @@ class TimeTableDisplayWindow(QMainWindow):
                             # (dictionary value is {'not': '-' }
                             if teacher == 'not':
                                 slot_label = ''
+                                slot_number += 1
                             else:
                                 slot_label = subject[0] + '\n' + teacher
                                 trimmed_label = self.trim_label(slot_label, 2)
@@ -169,9 +174,15 @@ class TimeTableDisplayWindow(QMainWindow):
         else:
             self.next_button.setEnabled(False)
 
+    # function to display previously generated time table templates
+    def show_previous_time_table(self):
+        pass
+
     # function that is to be performed on clicking 'Finalize' button
     def finalize_time_table(self):
         self.time_table.store_time_table_in_db()
+        """it must close itself and return a value to the 'TimeTableOutputWindow file.
+            This returned value will trigger closing function resulting in home screen display"""
 
     # function to trim down lecture label if it is too long
     def trim_label(self, original_label, words_limit):
