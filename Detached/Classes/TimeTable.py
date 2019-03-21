@@ -4,10 +4,6 @@ from Detached.Global.Variables.varFile1 import *
 from Detached.Global.Configurations.ConnectionEstablishment import *
 from Detached.Classes.Course import *
 
-# provide the semester in argument below form GUI
-# asking a list of subjects in a given course in a given semester
-sub_list = get_list_of_subject_for("MCA", semester='4')
-
 prev_time_tables = []
 
 
@@ -19,26 +15,28 @@ class TimeTable:
         self.course = course
         self.semester = str(semester)                    # semester is stored into string format in the database
         self.totalSlots = maximumSlots              # decides till when the batch will go on
-        self.lectures = []                          # contains the mappings of teachers and their subject
-        """ format => [ {"teacher1" : "subject1"}, {"teacher2" : "subject2"} ]"""
 
-        self.assignedLectures = []                  # initially empty, will be updated only by place()/assign() function
-        """ format => [ {"Monday" : [1,2,3] }, {"Tuesday" : [1,2,3,4] } ]"""
+        # contains the mappings of teachers and their subject
+        self.lectures = []                          # format => [ {"teacher1" : "subject1"}, {"teacher2" : "subject2"} ]
 
-        self.freeLectures = []            # initially empty, used as the list on which to iterate for placing lectures
-        self.daysList = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"]
+        # initially empty, will be updated only by place()/assign() function
+        self.assignedLectures = []          # format => [ {"Monday" : [1,2,3] }, {"Tuesday" : [1,2,3,4] } ]
 
-    def map(self, teachers):                        # teachers: T3, T1, T2, T6, T4  (as an example)
-        """Mapping is done on the basis matching the sequence of subjects and sequence of
-           teachers provided as in the list.
-           So mapping would be as:
-           MCA-401 => T3, MCA-402 => T1, MCA-403 => T2, MCA-404 => T6, MCA-405 => T4 """
-        pass
+        # initially empty, used as the list on which to iterate for placing lectures
+        self.freeLectures = []
+    
+        # obtaining all subjects taught in a given semester of a given course
+        self.subjectList = get_list_of_subject_for(self.course, self.semester)
+
+    # creating a dictionary for subject as key and teaching hours per week per subject as 4
+    def create_dict_per_week_lecture_hrs(self):
+        lecture_per_week = {subject: 0 for subject in self.subjectList}
+        return lecture_per_week
 
     def place(self, teacher_to_place):   # teacher-subject mapping should be provided with teacher as keys
 
         # getting a dictionary of subject and respective lectures per week
-        lecture_per_week = create_dict_per_week_lecture_hrs()
+        lecture_per_week = self.create_dict_per_week_lecture_hrs()
 
         """Checking and returning the last value if the limit of time table generation is reached"""
         if len(prev_time_tables) >= time_table_generation_limit:
@@ -59,7 +57,7 @@ class TimeTable:
             while True:
                 # creating a matrix for [days*slots], rows represents days and columns represent slots
                 # it is a nested list of dictionaries in which every dictionary represent {teacher:subjects}
-                time_table = [[{} for _ in range(maximumSlots)] for _ in range(len(self.daysList))]
+                time_table = [[{} for _ in range(maximumSlots)] for _ in range(len(days_list))]
                 for slot in range(maximumSlots):
                     for day in range(len(time_table)):
                         # randomly picking a teacher from the given mapping
@@ -68,7 +66,7 @@ class TimeTable:
                         selected_teacher = self.random(teacher_list)
 
                         # checking if the randomly selected teacher is available for a particular slot or not
-                        if selected_teacher in get_teacher_availability_for_a_slot(self.daysList[day], slot + 1):
+                        if selected_teacher in get_teacher_availability_for_a_slot(days_list[day], slot + 1):
                             for dictionary in teacher_to_place:
                                 if selected_teacher in dictionary:
                                     # actual placing of teacher-subject mapping
@@ -104,7 +102,7 @@ class TimeTable:
         i = 0
         for index in range(len(prev_time_tables[-1])):
             for _ in range(len(prev_time_tables[-1][index])):
-                query = "empty_slots" + ".$[]." + str(self.daysList[i])
+                query = "empty_slots" + ".$[]." + str(days_list[i])
                 slot_no = str(index + 1)
                 # pulling out the empty_slots from respective teachers
                 db[teacher_collection].find_one_and_update({"uid": str(prev_time_tables[-1][index][i])},
@@ -179,9 +177,3 @@ def update_subjects_of_teachers(list_of_dictionaries):
         for key, values in list_of_dictionaries[index].items():
             db[teacher_collection].find_one_and_update({"uid": str(key)},
                                                        {"$set": {"subjects": values}})
-
-
-# creating a dictionary for subject as key and teaching hours per week per subject as 4
-def create_dict_per_week_lecture_hrs():
-    lecture_per_week = {subject: 0 for subject in sub_list}
-    return lecture_per_week
