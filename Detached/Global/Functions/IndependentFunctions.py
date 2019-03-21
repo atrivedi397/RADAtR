@@ -158,3 +158,5 @@ def add_time_to(initial_time, minutes_to_add):
     else:
         print('Invalid input for initial time. Must be of 4 digits')
         return -1
+insert_all()
+
