@@ -79,6 +79,3 @@ def get_list_of_subject_for(course, semester):
         sub_list.append(subject)
     print(sub_list)
     return sub_list
-
-
-get_list_of_subject_for("MCA", 3)
