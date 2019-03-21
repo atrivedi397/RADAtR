@@ -2,7 +2,7 @@ import sys
 from PyQt5.QtWidgets import *
 from Detached.Global.Functions.IndependentFunctions import add_time_to
 from Detached.Classes.TimeTable import *
-from testFile1 import test_list
+# from testFile1 import test_list
 
 
 class TimeTableDisplayWindow(QMainWindow):
