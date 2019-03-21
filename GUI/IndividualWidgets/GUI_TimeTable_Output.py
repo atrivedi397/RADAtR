@@ -1,6 +1,6 @@
 import sys
 from PyQt5.QtWidgets import *
-from Detached.Global.Functions.IndependentFunctions import add_time_to
+from Detached.Global.Functions.IndependentFunctions import add_time_to, last_name_only
 from Detached.Classes.TimeTable import *
 # from testFile1 import test_list
 
@@ -18,7 +18,8 @@ class TimeTableDisplayWindow(QMainWindow):
         self.slotDuration = '60'
         self.slots = []
         self.listOfSlots = slots_list
-        self.timeTableGenerated = 0
+        self.timeTableGenerated = 1
+        self.timeTableMaxGenerationLimit = 5
 
         # batch timing validations
         if self.baseTime == '':
@@ -85,6 +86,7 @@ class TimeTableDisplayWindow(QMainWindow):
         self.containerWidget.setLayout(self.layout)
         self.assign_mappings()
 
+    # function which gets time-duration
     def get_next_slot(self, for_n_slots):
         for i in range(for_n_slots):
             # representation for 'Recess' Column
@@ -109,8 +111,9 @@ class TimeTableDisplayWindow(QMainWindow):
                 column_label = start + '-' + end
                 self.slots.append(column_label)
 
+    # function to assign 'Subject-teacher' mapping to each slot of each week.
     def assign_mappings(self):
-        if self.timeTableGenerated < 5 - 1:
+        if self.timeTableGenerated <= self.timeTableMaxGenerationLimit:
             mapping_list = self.time_table.place(self.listOfSlots)
 
             day_number = 0
@@ -121,13 +124,25 @@ class TimeTableDisplayWindow(QMainWindow):
                 slot_number = 0
                 for lecture in day:
                     for teacher, subject in lecture.items():
+                        # putting a single letter of 'LUNCH' in each day for lunch slot.
                         if slot_number == lunch_slot_no - 1:
                             self.tableWidget.setItem(day_number, slot_number, QTableWidgetItem(lunch[day_number]))
                             slot_number += 1
+                        # putting a subject lecture
                         else:
-                            slot_label = subject[0] + '\n' + teacher
-                            self.tableWidget.setItem(day_number, slot_number, QTableWidgetItem(slot_label))
-                            slot_number += 1
+                            # no labels for the slots for which no teachers are available
+                            # (dictionary value is {'not': '-' }
+                            if teacher == 'not':
+                                slot_label = ''
+                            else:
+                                slot_label = subject[0] + '\n' + teacher
+                                trimmed_label = self.trim_label(slot_label, 2)
+
+                                # shortening teacher's name
+                                trimmed_label = trimmed_label + '\n' + last_name_only(teacher)
+
+                                self.tableWidget.setItem(day_number, slot_number, QTableWidgetItem(trimmed_label))
+                                slot_number += 1
                 day_number += 1
             self.timeTableGenerated += 1
         else:
@@ -136,6 +151,35 @@ class TimeTableDisplayWindow(QMainWindow):
     # function that is to be performed on clicking 'Finalize' button
     def finalize_time_table(self):
         self.time_table.store_time_table_in_db()
+
+    # function to trim down lecture label if it is too long
+    def trim_label(self, original_label, words_limit):
+        word_count = 0
+        invalid_word_count = 0
+        words_in_label = original_label.split()             # finding the total number of words in whole label string
+
+        # counting the (appropriate) words
+        invalid_name_words = ['of', 'in', 'and', 'the', '&', 'based', 'on', 'at']
+        for word in words_in_label:
+            for invalid_word in invalid_name_words:
+                if word == invalid_word:
+                    invalid_word_count += 1
+                else:
+                    word_count += 1
+
+        if word_count > words_limit:
+            # shortened list of words
+            name_list = words_in_label[0: words_limit + invalid_word_count]
+
+            # removing any invalid word which comes at the end
+            for invalid_word in invalid_name_words:
+                if name_list[-1] == invalid_word:                   # if last word is invalid word
+                    invalid_word_count -= 1
+                    break
+
+            # joining the words together to form a string/label
+            short_label = ' '.join(words_in_label[0: words_limit + invalid_word_count])
+            return short_label
 
 
 def main():

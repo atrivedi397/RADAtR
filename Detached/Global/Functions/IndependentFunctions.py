@@ -158,3 +158,22 @@ def add_time_to(initial_time, minutes_to_add):
     else:
         print('Invalid input for initial time. Must be of 4 digits')
         return -1
+
+
+# function to shorten name by returning only last name
+def last_name_only(name):
+    short_name = ''                                 # initially empty
+    words_in_name = name.split()        # create a list of words present in whole name
+
+    # if name consists of single word only, return name as it is.
+    if len(words_in_name) == 1:
+        return name
+    else:
+        # creating acronym for name
+        for i in range(len(words_in_name) - 1):
+            word = words_in_name[i]
+            short_name = short_name + word[0] + '. '
+
+        # appending the last name in acronym
+        short_name = short_name + words_in_name[-1]
+        return short_name
