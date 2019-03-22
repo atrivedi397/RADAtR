@@ -22,7 +22,7 @@ class WorkInProgress:
         # style to heading
         self.font = QFont()
         self.font.setBold(True)
-        self.font.setPointSize(16)
+        self.font.setPointSize(24)
 
         # heading of the template
         self.headingLabel = QLabel(self.heading)
@@ -31,6 +31,6 @@ class WorkInProgress:
 
         # stacking all components/widgets vertically
         self.incompleteWorkTemplateLayout.addWidget(self.headingLabel)
-        # self.incompleteWorkTemplateLayout.addStretch(1)
+        self.incompleteWorkTemplateLayout.setContentsMargins(80, 20, 0, 0)
         self.incompleteWorkTemplateLayout.addWidget(self.messageLabel)
         self.incompleteWorkTemplateLayout.addStretch(4)
