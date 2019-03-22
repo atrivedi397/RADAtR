@@ -1,6 +1,7 @@
+import sys
 from GUI.GUI_ModulePanel import *
 from GUI.GUI_NavigationPanel import *
-from GUI.GUI_TimeTable_Create import *
+from GUI.OutputWidgetsContainer import *
 
 
 class MainWindow(QMainWindow):
@@ -8,12 +9,12 @@ class MainWindow(QMainWindow):
         super().__init__(parent)
 
         # main window properties
-        self.setFixedSize(1080, 682)
+        self.setFixedSize(1080, 640)
         self.setWindowTitle('Main Window')
 
-        # menu bar settings
+        # menu bar
         self.menuBar = QMenuBar(self)
-
+        self.menuBar.setGeometry(0, 0, 1080, 29)
         # adding Menu Tabs
         self.applicationTab = self.menuBar.addMenu('Application')
         self.aboutTab = self.menuBar.addMenu('About')
@@ -22,50 +23,35 @@ class MainWindow(QMainWindow):
         # status bar properties
         self.statusBar().showMessage('This is a status bar.')
 
-        # central widget (main parent widget)
-        self.container = QWidget(self)
-        self.container.setGeometry(0, 21, 1080, 640)      # 21x2 px is taken by menu(top) and status bar(bottom)
+        # container of all widgets, except for menu bar and status bar
+        self.rootContainer = QWidget(self)
+        self.rootContainer.setGeometry(0, 30, 1080, 588)
+        # self.rootContainer.setStyleSheet('border: 1px solid black')             # for testing purpose
 
-        # layout for central widget (container)
-        self.containerLayout = QHBoxLayout(self.container)
+        # layout of root container
+        self.rootContainerLayout = QHBoxLayout(self.rootContainer)
 
-        # left most (vertical) toggle bar
-        self.leftBar = LeftModulePanel(self.container)
-        self.leftBar.timeTableButton.clicked.connect(self.toggle_nav)
+        """---------------------- Root Container child Widgets ---------------------"""
+        # Root container consists of 3 main areas in sequence (horizontally):
+        # 1) Modules Panel      2) Options of Selected Modules          3) Container to show all outputs
 
-        self.navBar = NavigationPanel(self.container)
-        self.navBar.timeTableList.itemClicked.connect(self.show_widgets)
+        # An Option list (i.e. 2nd area) for the selected module
+        self.moduleOptions = NavigationPanel(self.rootContainer)
+        # self.moduleOptions.timeTableList.itemClicked.connect(self.show_widgets)
 
-        # right sided dynamic widgets
-        self.blankArea = QWidget(self.container)
-        # self.blankArea.setStyleSheet('border: 1px solid green')
+        # A Navigation Panel (i.e. 1st area) containing each module of RADAtR
+        self.modulesPanel = LeftModulePanel(self.rootContainer, self.moduleOptions)
+        # self.modulesPanel.timeTableButton.clicked.connect(self.toggle_nav)
 
-        # layout for widgets under blank area
-        self.innerLayout = QHBoxLayout(self.blankArea)
-        self.createTTWin = TimeTableWindow(self.blankArea)
-        self.createTTWin.createTimeTableWindow.hide()
-        self.innerLayout.addWidget(self.createTTWin.createTimeTableWindow)
-        self.innerLayout.setContentsMargins(0, 0, 0, 0)
-        self.blankArea.setLayout(self.innerLayout)
+        # A sub container for displaying any required widget as output
+        self.outputContainer = DynamicWidgets(self.rootContainer)
 
-        # stacking all widgets on the main widget (ie container)
-        self.containerLayout.addWidget(self.leftBar.modulePanel, 0)
-        self.containerLayout.addWidget(self.navBar.navPanel, 0)
-        self.containerLayout.addWidget(self.blankArea, 1)
-        self.containerLayout.setContentsMargins(0, 0, 0, 0)
-        self.containerLayout.setSpacing(0)
-        self.container.setLayout(self.containerLayout)
-
-    # function to show/hide "Time-Table" (navigation) bar
-    def toggle_nav(self):
-        status = self.navBar.navPanel.isHidden()
-        if status is False:
-            self.navBar.navPanel.hide()
-        else:
-            self.navBar.navPanel.show()
-
-    def show_widgets(self):
-        self.createTTWin.createTimeTableWindow.show()
+        # horizontally aligning the 3 main areas (modulesPanel, moduleOptions, outputContainer)
+        self.rootContainerLayout.addWidget(self.modulesPanel.modulePanel)
+        self.rootContainerLayout.addWidget(self.moduleOptions.navPanel)
+        self.rootContainerLayout.addWidget(self.outputContainer.OutputWidgetsContainer)
+        self.rootContainerLayout.setContentsMargins(0, 0, 0, 0)
+        self.rootContainerLayout.setSpacing(0)
 
 
 def main():
