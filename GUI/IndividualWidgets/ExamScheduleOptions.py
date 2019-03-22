@@ -1,22 +1,21 @@
-"""This class intents to provide modularity and hence, reducing the code of GUI_NavigationPanel.
-    This file is not being used anywhere because of the unexpected error (class isn't accepting any arguments)"""
-from PyQt5.QtWidgets import *
+"""This class intents to provide modularity and hence, reducing the code of GUI_NavigationPanel."""
+from PyQt5.QtWidgets import (QWidget, QVBoxLayout, QLabel, QListWidget)
 
 
-class ExamScheduleOptions(QWidget):
-    def __int__(self, parent=None):
-        super.__init__(parent)
+class ExamScheduleOptions:
+    def __init__(self, base=None):
         # used to help in determining the start index for another list, embedded in same stacking list
-        self.totalOptions = 4                               # this must be update if new options are added
+        self.totalOptions = 4  # this must be update if new options are added
 
-        # layout
-        self.examScheduleOptionsLayout = QVBoxLayout(self)
+        # creation of the widget
+        self.examScheduleOptions = QWidget(base)
+        self.examScheduleOptionsLayout = QVBoxLayout(self.examScheduleOptions)
 
         # heading for Exam-Schedule List
-        self.examScheduleHead = QLabel('Exam', self)
+        self.examScheduleHead = QLabel('Exam', self.examScheduleOptions)
 
         # creating options list for exam-schedule module
-        self.examScheduleList = QListWidget(self)
+        self.examScheduleList = QListWidget(self.examScheduleOptions)
 
         # List items
         self.examScheduleList.insertItem(0, 'Schedule')

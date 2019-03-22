@@ -1,4 +1,6 @@
-from PyQt5.QtWidgets import *
+from GUI.IndividualWidgets.ExamScheduleOptions import *
+from GUI.IndividualWidgets.TimeTableOptions import *
+from PyQt5.QtWidgets import QStackedWidget
 
 
 class NavigationPanel:
@@ -6,27 +8,24 @@ class NavigationPanel:
 
         # navigation panel
         self.navPanel = QWidget(base)
+        self.navPanel.setHidden(True)
         self.navPanel.setFixedWidth(175)
 
         # navigation panel layout
         self.navLayout = QVBoxLayout(self.navPanel)
 
-        # for Time-Table List
-        self.timeTableList = QListWidget(self.navPanel)
-        # self.timeTableList.setFixedWidth(200)
+        # navigation panel (widgets) stack list
+        self.submoduleStack = QStackedWidget(self.navPanel)
 
-        # List items
-        self.timeTableList.insertItem(0, 'Creation')
-        self.timeTableList.insertItem(1, 'Viewing')
-        self.timeTableList.insertItem(2, 'Editing')
-        self.timeTableList.insertItem(3, 'Deletion')
+        """------------ Adding sub module options in above stack -------------"""
+        self.testTimeTable = TimeTableOptions(self.navPanel)
+        self.examScheduleSubModule = ExamScheduleOptions(self.navPanel)
 
-        # heading for Time-Table List
-        self.timeTableHead = QLabel('Time Table:', self.navPanel)
+        # stacking (TimeTableOption and ExamScheduleSubModule)
+        self.submoduleStack.addWidget(self.testTimeTable.testTimeTable)
+        self.submoduleStack.addWidget(self.examScheduleSubModule.examScheduleOptions)
 
-        # stacking up all widgets in vertical layout
-        self.navLayout.addWidget(self.timeTableHead)
-        self.navLayout.addWidget(self.timeTableList)
+        self.navLayout.addWidget(self.submoduleStack)
         self.navLayout.setContentsMargins(0, 3, 0, 3)
         self.navLayout.setSpacing(1)
-        self.navPanel.setLayout(self.navLayout)
+

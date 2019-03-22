@@ -1,13 +1,13 @@
-"""This class intents to provide modularity and hence, reducing the code of GUI_NavigationPanel.
-    This file is not being used anywhere because of the unexpected error (class isn't accepting any arguments)"""
+"""This class intents to provide modularity and hence, reducing the code of GUI_NavigationPanel."""
+from PyQt5.QtWidgets import (QWidget, QVBoxLayout, QLabel, QListWidget)
 
 
 class TimeTableOptions:
-    def __int__(self, parent=None):
+    def __init__(self, base=None):
         # used to help in determining the start index for another list, embedded in same stacking list
-        self.totalOptions = 4                               # this must be update if new options are added
+        self.totalOptions = 4  # this must be update if new options are added
 
-        self.testTimeTable = QWidget(parent)
+        self.testTimeTable = QWidget(base)
         self.timeTableOptionsLayout = QVBoxLayout(self.testTimeTable)
 
         # heading for Time-Table List
