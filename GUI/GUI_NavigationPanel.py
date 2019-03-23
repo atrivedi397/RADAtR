@@ -24,8 +24,9 @@ class NavigationPanel:
 
         """------------ Adding sub module options in above stack -------------"""
         self.testTimeTable = TimeTableOptions(self.navPanel, self.functionReference, self.indexOccupied)
-        self.indexOccupied += self.testTimeTable.totalOptions
-        self.examScheduleSubModule = ExamScheduleOptions(self.navPanel)
+        self.indexOccupied += self.testTimeTable.totalOptions           # updating number of occupied indexes
+        self.examScheduleSubModule = ExamScheduleOptions(self.navPanel, self.functionReference, self.indexOccupied)
+        self.indexOccupied += self.examScheduleSubModule.totalOptions  # updating number of occupied indexes
 
         # stacking (TimeTableOption and ExamScheduleSubModule)
         self.submoduleStack.addWidget(self.testTimeTable.timeTableOptionsWidget)
