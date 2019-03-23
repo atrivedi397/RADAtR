@@ -59,6 +59,7 @@ class DynamicWidgets:
         # stacking independent widgets (not called by any user)
         self.outputStack.addWidget(self.template.incompleteWorkTemplate)
         self.outputStack.addWidget(self.blankWidget)
+        self.outputStack.setCurrentIndex(10)                                # set blank/empty widget at startup
 
         # adding outputStack to the layout of outputContainer
         self.outputContainerLayout.addWidget(self.outputStack)
