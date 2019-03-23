@@ -1,101 +1,112 @@
-import sys
 from Detached.Classes.Teacher import *
-from PyQt5.QtWidgets import *
+from PyQt5.QtGui import QFont
+from PyQt5.QtWidgets import (
+    QWidget, QLabel, QPushButton, QLineEdit, QComboBox,
+    QVBoxLayout, QHBoxLayout, QFormLayout, QFrame
+)
 
 
-class AddingFunctionality(QWidget):
+class AddTeacher(QWidget):
     def __init__(self, parent=None):
         super().__init__(parent)
 
-        self.setFixedSize(600, 400)
-        self.setGeometry(300, 90, 600, 400)
-        self.setWindowTitle(" UPDATE OF TEACHER'S DATABASE")
+        # information variables (must fetch values from database)
+        self.departmentList = ['Department of Computer Science', 'Department of Applied Physics']
+        self.courseList = ['MCA', 'M.Tech', 'M.Sc I.T.']
+        self.designationList = ['Professor', 'Assistant Professor', 'Associate Professor']
+        self.message = ''                               # used to show warnings/status upon clicking 'Add' button
 
-        LabelMainWindow = QLabel("PLEASE  ENTER  THE  DETAILS  OF  THE  TEACHERS", self)
-        LabelMainWindow.move(120, 2)
-        LabelMainWindow.setStyleSheet("font-weight: bold;"
-                                      "font-family: Times New Roman ;"
-                                      " color: black ; "
-                                      "font-size: 10pt")
-        add = QPushButton("ADD",self)
-        add.move(200,350)
-        add.clicked.connect(self.add_teacher)
+        # creating style to apply on heading
+        self.font = QFont()
+        self.font.setBold(True)
+        self.font.setPointSize(24)
 
-        # namefield
+        # layout of this widget
+        self.rootVerticalLayout = QVBoxLayout(self)
 
-        self.nameLabel = QLabel("NAME",self)
-        self.nameLabel.move(70,70)
-        self.nameField = QLineEdit(self)
-        self.nameField.move(250,60)
-        self.nameField.setFixedWidth(200)
-        self.nameField.setFixedHeight(30)
+        # 3 part of this widget (i.e. Header, Body and Footer)
+        # header part:
+        self.headerPart = QWidget(self)
+        self.headerPartLayout = QVBoxLayout(self.headerPart)
 
-        # DEPARTMENT
-        subField = QLabel("DEPARTMENT", self)
-        subField.move(70, 110)
-        self.department = ["DCS", "Msc.-IT", "HINDI", "MATHS", "BA"]
-        self.teacher_options = QComboBox(self)
-        self.teacher_options.addItems(self.department)
-        self.teacher_options.move(250,110)
-        self.teacher_options.setFixedWidth(200)
+        # widgets inside header part
+        self.heading = QLabel('Add Teacher To A Course', self.headerPart)
+        self.heading.setFont(self.font)
+        self.headingPrompt = QLabel('Please provide following information about the teacher', self.headerPart)
+        self.headerPartLayout.addWidget(self.heading)
+        self.headerPartLayout.addWidget(self.headingPrompt)
 
-        # COURSE
-        self.courseLabel = QLabel("COURSE",self)
-        self.courseLabel.move(70,150)
-        self.courseField = QLineEdit(self)
-        self.courseField.move(250,150)
-        self.courseField.setFixedWidth(200)
-        self.courseField.setFixedHeight(30)
+        # body part:
+        self.bodyPart = QWidget(self)
+        self.bodyPartLayout = QFormLayout(self.bodyPart)
 
-        # Designation
-        nameField = QLabel("DESIGNATION", self)
-        nameField.move(70, 190)
-        self.designation = ["PROFESSOR", "ASSISTANT PROFESSOR", "ASSOCIATE PROFESSOR"]
-        self.teacher_designation = QComboBox(self)
-        self.teacher_designation.addItems(self.designation)
-        self.teacher_designation.move(250, 190)
-        self.teacher_designation.setFixedWidth(200)
+        # widgets inside bodyPart
+        self.nameField = QLineEdit()                                           # for teacher's name input
+        self.nameField.setFixedWidth(300)
+        self.departmentField = QComboBox(self.bodyPart)
+        self.departmentField.addItems(self.departmentList)   # name of department which the teacher belongs to
+        self.departmentField.setFixedWidth(300)
+        self.courseField = QComboBox(self.bodyPart)
+        self.courseField.addItems(self.courseList)                    # for name of course which the teacher belongs to
+        self.courseField.setFixedWidth(300)
+        self.designationField = QComboBox(self.bodyPart)
+        self.designationField.addItems(self.designationList)   # for type of designation what the teacher belongs to
+        self.designationField.setFixedWidth(200)
+        self.maxLecturesField = QLineEdit()
+        self.maxLecturesField.setFixedWidth(100)
+        self.minLecturesField = QLineEdit()
+        self.minLecturesField.setFixedWidth(100)
 
-        # maximum lectures
-        maxLectures = QLabel("MAXIMUM LECTURES", self)
-        maxLectures.move(70, 230)
-        self.TextmaxLectures = QLineEdit(self)
-        self.TextmaxLectures.move(250, 230)
-        self.TextmaxLectures.setFixedWidth(200)
-        self.TextmaxLectures.setFixedHeight(30)
+        # form like alignment/layout for above widget
+        self.bodyPartLayout.addRow('Name of the Teacher', self.nameField)
+        self.bodyPartLayout.addRow('Teacher\'s Department', self.departmentField)
+        self.bodyPartLayout.addRow('Course belongs to', self.courseField)
+        self.bodyPartLayout.addRow('Teacher\'s Designation', self.designationField)
+        self.bodyPartLayout.addRow('Teacher\'s Max Lectures', self.maxLecturesField)
+        self.bodyPartLayout.addRow('Teacher\'s Min Lectures', self.minLecturesField)
 
-        # min lectures
-        minLectures = QLabel("MINIMUM LECTURES", self)
-        minLectures.move(70, 270)
-        self.TextminLectures = QLineEdit(self)
-        self.TextminLectures.move(250, 270)
-        self.TextminLectures.setFixedWidth(200)
-        self.TextminLectures.setFixedHeight(30)
+        # Footer part:
+        self.footerPart = QWidget(self)
+        self.footerPartLayout = QHBoxLayout(self.footerPart)
+
+        # widgets inside footer part
+        self.footerPrompt = QLabel(self.message, self.footerPart)
+        self.cancelButton = QPushButton('Cancel', self.footerPart)
+        self.addButton = QPushButton('Add', self.footerPart)
+        # self.addButton.clicked.connect(self.add_teacher)                  # uncomment this line to add teacher to DB
+        self.footerPartLayout.addWidget(self.footerPrompt, 2)
+        self.footerPartLayout.addWidget(self.cancelButton)
+        self.footerPartLayout.addWidget(self.addButton)
+
+        # creating a horizontal line
+        self.horizontalLine = QFrame(self)
+        self.horizontalLine.setFrameShape(QFrame.HLine)
+        self.horizontalLine.setFrameShadow(QFrame.Sunken)
+
+        # stacking all the widgets in the main layout
+        self.rootVerticalLayout.addWidget(self.headerPart)
+        self.rootVerticalLayout.addWidget(self.bodyPart)
+        self.rootVerticalLayout.addStretch(5)
+        self.rootVerticalLayout.addWidget(self.horizontalLine)
+        self.rootVerticalLayout.addWidget(self.footerPart)
+        self.rootVerticalLayout.setContentsMargins(80, 10, 0, 0)
 
     def add_teacher(self):
         name = self.nameField.text()
-        department = self.teacher_options.currentText()
-        designation = self.teacher_designation.currentText()
-        min_lect = self.TextminLectures.text()
-        max_lect = self.TextmaxLectures.text()
+        department = self.departmentField.currentText()
+        designation = self.designationField.currentText()
+        course = self.courseField.currentText()
+        min_lectures = self.minLecturesField.text()
+        max_lectures = self.maxLecturesField.text()
 
-        teacher = Teacher(name, department, designation, max_lect, min_lect)
-        teacher.add_teacher()
+        # creating a Teacher class instance
+        teacher = Teacher(name, department, designation, max_lectures, min_lectures, None, course)
+        teacher.add_teacher()                           # storing teacher details in database
 
+        # resetting the values of each widget
         self.nameField.clear()
-        self.teacher_options.setCurrentIndex(0)
-        self.teacher_designation.setCurrentIndex(0)
+        self.departmentField.setCurrentIndex(0)
+        self.designationField.setCurrentIndex(0)
+        self.courseField.setCurrentIndex(0)
         self.TextminLectures.clear()
         self.TextmaxLectures.clear()
-
-
-def main():
-    ObjQApplication = QApplication(sys.argv)
-    ObjQApplication.setStyle('Fusion')
-    ObjAddingFunctionality = AddingFunctionality()
-    ObjAddingFunctionality.show()
-    sys.exit(ObjQApplication.exec_())
-
-
-if __name__ == '__main__':
-    main()
