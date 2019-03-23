@@ -35,16 +35,16 @@ class MainWindow(QMainWindow):
         # Root container consists of 3 main areas in sequence (horizontally):
         # 1) Modules Panel      2) Options of Selected Modules          3) Container to show all outputs
 
+        # A sub container (i.e. 3rd area) for displaying any required widget as output
+        self.outputContainer = DynamicWidgets(self.rootContainer)
+        self.changeDynamicWidgetRef = self.outputContainer.change_window
+
         # An Option list (i.e. 2nd area) for the selected module
-        self.moduleOptions = NavigationPanel(self.rootContainer)
-        # self.moduleOptions.timeTableList.itemClicked.connect(self.show_widgets)
+        self.moduleOptions = NavigationPanel(self.rootContainer, self.changeDynamicWidgetRef)
 
         # A Navigation Panel (i.e. 1st area) containing each module of RADAtR
         self.modulesPanel = LeftModulePanel(self.rootContainer, self.moduleOptions)
         # self.modulesPanel.timeTableButton.clicked.connect(self.toggle_nav)
-
-        # A sub container for displaying any required widget as output
-        self.outputContainer = DynamicWidgets(self.rootContainer)
 
         # horizontally aligning the 3 main areas (modulesPanel, moduleOptions, outputContainer)
         self.rootContainerLayout.addWidget(self.modulesPanel.modulePanel)
