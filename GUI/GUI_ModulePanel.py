@@ -40,6 +40,7 @@ class LeftModulePanel:
 
         # for miscellaneous sub-modules (Indexed at 4)
         self.unitSubModuleButton = QPushButton('', self.modulePanel)
+        self.unitSubModuleButton.clicked.connect(lambda: self.show_module_options(2))
         self.unitSubModuleButton.setIcon(QIcon('Icons/timetable.png'))
         self.unitSubModuleButton.setIconSize(QSize(40, 40))
 

@@ -1,11 +1,11 @@
 from PyQt5.QtWidgets import (
     QWidget, QVBoxLayout, QHBoxLayout, QLabel, QLineEdit, QFormLayout,
-    QPushButton, QFrame
+    QComboBox, QPushButton, QFrame
 )
 from PyQt5.QtGui import QFont
 
 
-class AddCourse(QWidget):
+class AddSubjects(QWidget):
     def __init__(self, parent=None):
         super().__init__(parent)
 
@@ -23,9 +23,9 @@ class AddCourse(QWidget):
         # header part (contains heading and main prompt)
         self.headerPart = QWidget(self)
         self.headerPartLayout = QVBoxLayout(self.headerPart)
-        heading = QLabel("Add a Course", self.headerPart)
+        heading = QLabel("Add Subjects For A Course", self.headerPart)
         heading.setFont(self.font)
-        main_prompt = QLabel("Enter the details of the course to be added.", self.headerPart)
+        main_prompt = QLabel("Enter the details for adding subjects for the course.", self.headerPart)
         # adding widget to layout
         self.headerPartLayout.addWidget(heading)
         self.headerPartLayout.addWidget(main_prompt)
@@ -34,19 +34,20 @@ class AddCourse(QWidget):
         self.contentPart = QWidget(self)
         self.nestedFormLayout = QFormLayout(self.contentPart)
 
-        self.courseNameField = QLineEdit()                # for 'course name' input
-        self.courseNameField.setFixedWidth(300)
-        self.semesterField = QLineEdit()                      # for 'number of semesters' input
-        self.semesterField.setFixedWidth(300)
-        self.subjectsPerSemester = QLineEdit()           # for 'number of subjects/semester' input
-        self.subjectsPerSemester.setFixedWidth(50)
-        self.startTimingField = QLineEdit()                   # for 'course start timing' input
+        self.nameField = QLineEdit()                # for 'name' input
+        self.nameField.setFixedWidth(300)
+        self.codeField = QLineEdit()
+        self.codeField.setFixedWidth(100)
+        self.semesterField = QComboBox()
+        self.semesterField.addItems(["1", "2", "3", "4", "5", "6", "7", "8"])
+        self.semesterField.setFixedWidth(50)
+        self.startTimingField = QLineEdit()
         self.startTimingField.setFixedWidth(100)
 
         # adding widgets into the form layout
-        self.nestedFormLayout.addRow(QLabel("Name of the course"), self.courseNameField)
-        self.nestedFormLayout.addRow(QLabel("Total semesters in course"), self.semesterField)
-        self.nestedFormLayout.addRow(QLabel("Subjects per semester"), self.subjectsPerSemester)
+        self.nestedFormLayout.addRow(QLabel("Name of the course"), self.nameField)
+        self.nestedFormLayout.addRow(QLabel("Code for the course"), self.codeField)
+        self.nestedFormLayout.addRow(QLabel("Total Semesters"), self.semesterField)
         self.nestedFormLayout.addRow(QLabel("Starting Time (24-hours format)"), self.startTimingField)
 
         # footer part (contains message area, 'cancel' and 'add' buttons)
