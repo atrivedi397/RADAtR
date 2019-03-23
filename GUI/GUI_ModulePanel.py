@@ -17,31 +17,31 @@ class LeftModulePanel:
 
         """----------- buttons on the (left) Modules Panel --------------"""
         # for timeTable module (Indexed at 0)
-        self.timeTableButton = QPushButton('T', self.modulePanel)
+        self.timeTableButton = QPushButton('', self.modulePanel)
         self.timeTableButton.clicked.connect(lambda: self.show_module_options(0))
-        self.timeTableButton.setIcon(QIcon('Icons/timetable.png'))
+        self.timeTableButton.setIcon(QIcon('Icons/passage-of-time.svg'))
         self.timeTableButton.setIconSize(QSize(40, 40))
 
         # for scheduleExam module (Indexed at 1)
-        self.examScheduleButton = QPushButton('E', self.modulePanel)
+        self.examScheduleButton = QPushButton('', self.modulePanel)
         self.examScheduleButton.clicked.connect(lambda: self.show_module_options(1))
-        self.examScheduleButton.setIcon(QIcon('Icons/timetable.png'))
+        self.examScheduleButton.setIcon(QIcon('Icons/a.svg'))
         self.examScheduleButton.setIconSize(QSize(40, 40))
 
         # for Admission module (Indexed at 2)
         self.admissionButton = QPushButton('', self.modulePanel)
-        self.admissionButton.setIcon(QIcon('Icons/timetable.png'))
+        self.admissionButton.setIcon(QIcon('Icons/study.svg'))
         self.admissionButton.setIconSize(QSize(40, 40))
 
         # for calender or home screen (Indexed at 3)
         self.calenderButton = QPushButton('', self.modulePanel)
-        self.calenderButton.setIcon(QIcon('Icons/timetable.png'))
+        self.calenderButton.setIcon(QIcon('Icons/calendar.svg'))
         self.calenderButton.setIconSize(QSize(40, 40))
 
         # for miscellaneous sub-modules (Indexed at 4)
         self.unitSubModuleButton = QPushButton('', self.modulePanel)
         self.unitSubModuleButton.clicked.connect(lambda: self.show_module_options(2))
-        self.unitSubModuleButton.setIcon(QIcon('Icons/timetable.png'))
+        self.unitSubModuleButton.setIcon(QIcon('Icons/test.svg'))
         self.unitSubModuleButton.setIconSize(QSize(40, 40))
 
         # stacking all buttons inside the (left-most) panel
