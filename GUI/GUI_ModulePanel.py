@@ -12,6 +12,12 @@ class LeftModulePanel:
         self.modulePanel = QWidget(base)
         self.modulePanel.setMaximumWidth(50)                # static value, need not to be changed
 
+        # tooltip styling
+        self.modulePanel.setStyleSheet('QToolTip{'
+                                       'color: white;'
+                                       'background-color: black;'
+                                       'border: 0px}')
+
         # layout for left bar
         self.leftBarLayout = QVBoxLayout(self.modulePanel)
 
@@ -21,28 +27,33 @@ class LeftModulePanel:
         self.timeTableButton.clicked.connect(lambda: self.show_module_options(0))
         self.timeTableButton.setIcon(QIcon('Icons/passage-of-time.svg'))
         self.timeTableButton.setIconSize(QSize(40, 40))
+        self.timeTableButton.setToolTip('Time Table Management')
 
         # for scheduleExam module (Indexed at 1)
         self.examScheduleButton = QPushButton('', self.modulePanel)
         self.examScheduleButton.clicked.connect(lambda: self.show_module_options(1))
         self.examScheduleButton.setIcon(QIcon('Icons/a.svg'))
         self.examScheduleButton.setIconSize(QSize(40, 40))
+        self.examScheduleButton.setToolTip('Exam Scheduling')
 
         # for Admission module (Indexed at 2)
         self.admissionButton = QPushButton('', self.modulePanel)
         self.admissionButton.setIcon(QIcon('Icons/study.svg'))
         self.admissionButton.setIconSize(QSize(40, 40))
+        self.admissionButton.setToolTip('Admission Processing')
 
         # for calender or home screen (Indexed at 3)
         self.calenderButton = QPushButton('', self.modulePanel)
         self.calenderButton.setIcon(QIcon('Icons/calendar.svg'))
         self.calenderButton.setIconSize(QSize(40, 40))
+        self.calenderButton.setToolTip('Show Calendar')
 
         # for miscellaneous sub-modules (Indexed at 4)
         self.unitSubModuleButton = QPushButton('', self.modulePanel)
         self.unitSubModuleButton.clicked.connect(lambda: self.show_module_options(2))
         self.unitSubModuleButton.setIcon(QIcon('Icons/test.svg'))
         self.unitSubModuleButton.setIconSize(QSize(40, 40))
+        self.unitSubModuleButton.setToolTip('Other Administrative Tasks')
 
         # stacking all buttons inside the (left-most) panel
         self.leftBarLayout.addStretch(5)
