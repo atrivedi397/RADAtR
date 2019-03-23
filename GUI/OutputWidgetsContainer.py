@@ -9,6 +9,8 @@ from GUI.IndividualWidgets.TimeTable_Remove import RemoveTimeTable
 from GUI.IndividualWidgets.ExamSchedule_Create import CreateExamSchedule
 from GUI.IndividualWidgets.ExamSchedule_View import ViewExamSchedule
 from GUI.IndividualWidgets.ExamSchedule_Delete import DeleteExamSchedule
+from GUI.IndividualWidgets.Misc_AddSubject import AddSubjects
+from GUI.IndividualWidgets.GUI_Teacher_Add import AddTeacher
 
 
 class DynamicWidgets:
@@ -36,6 +38,8 @@ class DynamicWidgets:
         self.calender = QCalendarWidget(self.OutputWidgetsContainer)
         self.template = WorkInProgress(self.OutputWidgetsContainer)
         self.addCourseWindow = AddCourse(self.OutputWidgetsContainer)
+        self.addSubjectWindow = AddSubjects(self.OutputWidgetsContainer)
+        self.addTeacherWindow = AddTeacher(self.OutputWidgetsContainer)
 
         """ stacking up all the above widgets (indexes for following widgets start from 0) """
         """ Sequences of the following widgets are important """
@@ -52,6 +56,8 @@ class DynamicWidgets:
 
         # stacking miscellaneous options widget
         self.outputStack.addWidget(self.addCourseWindow)
+        self.outputStack.addWidget(self.addTeacherWindow)
+        self.outputStack.addWidget(self.addSubjectWindow)
 
         # stacking calender (main module itself, with no sub-modules)
         self.outputStack.addWidget(self.calender)
@@ -59,7 +65,7 @@ class DynamicWidgets:
         # stacking independent widgets (not called by any user)
         self.outputStack.addWidget(self.template.incompleteWorkTemplate)
         self.outputStack.addWidget(self.blankWidget)
-        self.outputStack.setCurrentIndex(10)                                # set blank/empty widget at startup
+        self.outputStack.setCurrentIndex(12)                                # set blank/empty widget at startup
 
         # adding outputStack to the layout of outputContainer
         self.outputContainerLayout.addWidget(self.outputStack)
