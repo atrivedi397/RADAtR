@@ -33,7 +33,25 @@ class TimeTable:
         lecture_per_week = {subject: 0 for subject in self.subjectList}
         return lecture_per_week
 
+    # function for getting and creating the dictionary of teachers teaching more than one subject
+    @staticmethod
+    def get_teachers_multiple_subjects(teacher_subject_map):
+        multiple_subjects = []
+        teacher_list = []
+        for value in teacher_subject_map:
+            temp_name = str(value.keys())
+            name = temp_name[12:-3]  # only extracting the name from whole word from string "dict_keys([\\Name\\])"
+            teacher_list.append(name)
+
+        for teacher in teacher_list:
+            for group in teacher_subject_map:
+                if teacher in group and len(group[teacher]) > 1:
+                    multiple_subjects.append(group)
+        return multiple_subjects
+
     def place(self, teacher_to_place):   # teacher-subject mapping should be provided with teacher as keys
+
+        teachers_with_multiple_subjects = self.get_teachers_multiple_subjects(teacher_to_place)
 
         # getting a dictionary of subject and respective lectures per week
         lecture_per_week = self.create_dict_per_week_lecture_hrs()
@@ -68,7 +86,9 @@ class TimeTable:
                         # checking if the randomly selected teacher is available for a particular slot or not
                         if selected_teacher in get_teacher_availability_for_a_slot(days_list[day], slot + 1):
                             for dictionary in teacher_to_place:
-                                if selected_teacher in dictionary:
+
+                                # if teacher is having more than 1 subjects to teach then follow this
+                                if selected_teacher in dictionary and dictionary in teachers_with_multiple_subjects:
                                     # actual placing of teacher-subject mapping
                                     time_table[day][slot][selected_teacher] = dictionary[selected_teacher]
 
@@ -76,9 +96,24 @@ class TimeTable:
                                     lecture_per_week[dictionary[selected_teacher][0]] += 1
 
                                     # counting the allotted lectures
-                                    # ensuring the lectures do not exceed 4 hours a week
-                                    if lecture_per_week[dictionary[selected_teacher][0]] >= 4:
+                                    # ensuring the lectures do not exceed 4 * allotted subjects to a teacher
+                                    # hours a week
+                                    if lecture_per_week[dictionary[selected_teacher][0]] >= 4*len(dictionary[selected_teacher]):
                                         teacher_list.remove(selected_teacher)
+
+                                else:
+                                    if selected_teacher in dictionary:
+                                        # actual placing of teacher-subject mapping
+                                        time_table[day][slot][selected_teacher] = dictionary[selected_teacher]
+
+                                        # adding 1 each time the subject is allotted/placed
+                                        lecture_per_week[dictionary[selected_teacher][0]] += 1
+
+                                        # counting the allotted lectures
+                                        # ensuring the lectures do not exceed 4 hours a week
+                                        if lecture_per_week[dictionary[selected_teacher][0]] >= 4:
+                                            teacher_list.remove(selected_teacher)
+
                         else:
                             time_table[day][slot]["not"] = "-"  # putting blank if selected teacher is not free for slot
 
@@ -135,6 +170,16 @@ class TimeTable:
                     return choice
                 else:
                     continue
+
+    # function to get the previous time tables out of a total of 5
+    @staticmethod
+    def get_prev_time_table(number):
+        if number > 5:
+            return prev_time_tables[-1]
+        elif number == 5:
+            return prev_time_tables[4]
+        else:
+            return prev_time_tables[number]
 
 
 choice_taken = None
