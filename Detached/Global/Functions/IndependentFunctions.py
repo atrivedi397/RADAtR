@@ -178,5 +178,4 @@ def last_name_only(name):
         short_name = short_name + words_in_name[-1]
         return short_name
 
-
 # print(get_list_of_subject_for("MCA", 5))

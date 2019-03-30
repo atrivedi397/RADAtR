@@ -7,6 +7,7 @@ class MainWindow(QMainWindow):
         super().__init__(parent)
 
         # main window properties
+
         self.setFixedSize(900, 520)
         self.setWindowTitle('Main Window')
 
@@ -15,23 +16,37 @@ class MainWindow(QMainWindow):
         self.container.setGeometry(0, 21, 890, 400)
         # self.container.setStyleSheet(" border:1px solid rgb(255, 170, 255);")
 
+        # contains the list of all the semesters selected by the user
+        self.semestersSelected = []
+        self.checkBoxes = []            # contains the text to be written on checkboxes i.e. the semester number
+        self.checkBoxesList = []        # contains the list of checkboxes(object)
+
+        self.FinalLayout = QVBoxLayout(self.container)
+
+        self.slotSemButtonLayout = QVBoxLayout(self.container)
+
         self.semSubButtonLayout = QVBoxLayout(self.container)
         # semSubButtonLayout is used to place the button and combingLayout vertically
         self.semCourseLayout = QHBoxLayout(self.container)
         # semCourseLayout contains the layout containing containerLayout and comboLayout and place them horizontally
         self.listOfCombo = []
 
-        self.semesterCheck()
-        self.courseCombo()
-        self.SubmitCancel()
+        # comboLayout contains the label " CHOOSE THE COURSE " and the combo box of the courses
+        self.comboBoxesList = ["MCA", "M Sc. IT", "MA(ENGLISH)", "MCA(EVENING)"]
+
+        self.semester_check()
+        self.course_combo()
+        self.submit_cancel()
+        self.time_slot()
+        self.working_days()
+        self.batch()
 
     """this function creates the checkboxes for the user to select the semester"""
 
-    def semesterCheck(self):
+    def semester_check(self):
         self.containerLayout = QVBoxLayout(self.container)
         # container layout contains the " CHOOSE THE SEMESTERS " label and the semester checkboxes
-        self.checkBoxes = []            # contains the text to be written on checkboxes i.e. the semester number
-        self.checkBoxesList = []        # contains the list of checkboxes(object)
+
         self.SemesterLabel = QLabel(" CHOOSE THE SEMESTERS ", self.container)
         self.containerLayout.addWidget(self.SemesterLabel)
 
@@ -41,7 +56,7 @@ class MainWindow(QMainWindow):
 
         for semesters in self.checkBoxes:
             # print(semesters)
-            self.returnFunctionCombo = self.comboCreation(semesters)
+            self.returnFunctionCombo = self.combo_box_creation(semesters)
             self.checkBoxesList.append(self.returnFunctionCombo)
             # print(self.checkBoxesList)
             self.containerLayout.addWidget(self.returnFunctionCombo)
@@ -49,18 +64,17 @@ class MainWindow(QMainWindow):
         self.semCourseLayout.addLayout(self.containerLayout)
 
     """ the function contains the common properties of every checkboxes 
-    i contains the text of all the checkboxes that is provided by the Semestercheck function"""
-    def comboCreation(self, i):
+    i contains the text of all the checkboxes that is provided by the semester_check function"""
+    def combo_box_creation(self, i):
         # print(i)
         self.multipleCheckboxes = QCheckBox(i, self.container)
-        # self.multipleCheckboxes.stateChanged.connect(self.clickBox)
+        # self.multipleCheckboxes.stateChanged.connect(self.click_box)
         return self.multipleCheckboxes
 
     """ this functions create the combo buttons to select the course"""
-    def courseCombo(self):
+    def course_combo(self):
         self.comboLayout = QVBoxLayout(self.container)
-        # comboLayout contains the label " CHOOSE THE COURSE " and the combo box of the courses
-        self.comboBoxesList = ["MCA", "M Sc. IT", "MA(ENGLISH)", "MCA(EVENING)"]
+
         self.courseLabel = QLabel(" CHOOSE THE COURSE ", self.container)
         self.comboLayout.addWidget(self.courseLabel)
 
@@ -70,12 +84,13 @@ class MainWindow(QMainWindow):
 
         self.semCourseLayout.addLayout(self.comboLayout)
 
-    def SubmitCancel(self):
+    def submit_cancel(self):
         self.buttonLayout = QHBoxLayout(self.container)
-        # buttonLayout cpntains the two submit and cancel button horizontally
+        # buttonLayout contains the two submit and cancel button horizontally
         self.Submit = QPushButton("SUBMIT", self.container)
-        self.Submit.clicked.connect(self.clickBox)
+        self.Submit.clicked.connect(self.click_box)
         self.Cancel = QPushButton("CANCEL", self.container)
+        self.Cancel.clicked.connect(exit)
 
         self.buttonLayout.addWidget(self.Submit)
         self.buttonLayout.addWidget(self.Cancel)
@@ -83,10 +98,10 @@ class MainWindow(QMainWindow):
         self.semSubButtonLayout.addLayout(self.semCourseLayout)
         self.semSubButtonLayout.addLayout(self.buttonLayout)
 
-    def clickBox(self):
-        cur_txt = self.comboBox.currentText()
-        print(cur_txt)
-        self.semestersSelected = []
+    def click_box(self):
+        # displays the current text value of combo box
+        self.cur_txt = self.comboBox.currentText()
+        print(self.cur_txt)
         for i in range(6):
             if self.checkBoxesList[i].isChecked():
                 # print(self.checkBoxesList[i].text())
@@ -99,6 +114,42 @@ class MainWindow(QMainWindow):
                 # print('Unchecked')
         print(self.semestersSelected)
         exit()
+
+    def time_slot(self):
+        self.workingslotbatchLayout = QHBoxLayout(self.container)
+        self.slotLabel = QLabel("enter the number of slots", self.container)
+        self.SlotTextbox = QLineEdit(self.container)
+        self.SlotTextbox.setFixedWidth(100)
+        self.SlotTextbox.setFixedHeight(20)
+        self.workingslotbatchLayout.addWidget(self.slotLabel)
+        self.workingslotbatchLayout.addWidget(self.SlotTextbox)
+
+        self.slotSemButtonLayout.addLayout(self.workingslotbatchLayout)
+        self.slotSemButtonLayout.addLayout(self.semSubButtonLayout)
+
+    def working_days(self):
+
+        self.workingdaysLabel = QLabel("enter the working days", self.container)
+        self.workingdaysTextbox = QLineEdit(self.container)
+        self.workingdaysTextbox.setFixedWidth(100)
+        self.workingdaysTextbox.setFixedHeight(20)
+        self.workingslotbatchLayout.addWidget(self.workingdaysLabel)
+        self.workingslotbatchLayout.addWidget(self.workingdaysTextbox)
+
+        # self.FinalLayout.addLayout(self.workingslotbatchLayout)
+        self.FinalLayout.addLayout(self.slotSemButtonLayout)
+
+    def batch(self):
+        self.workingdaysLabel = QLabel("enter the number of batch", self.container)
+        self.workingdaysTextbox = QLineEdit(self.container)
+        self.workingdaysTextbox.setFixedWidth(100)
+        self.workingdaysTextbox.setFixedHeight(20)
+        self.workingslotbatchLayout.addWidget(self.workingdaysLabel)
+        self.workingslotbatchLayout.addWidget(self.workingdaysTextbox)
+
+        self.FinalLayout.addLayout(self.workingslotbatchLayout)
+        self.FinalLayout.addLayout(self.slotSemButtonLayout)
+
 
 
 def main():
