@@ -50,6 +50,7 @@ class InitialConfigurations(QWidget):
 
         # list of all major Boards in India
         self.boardNames = [
+            '-- Select --',
             'Central Board of Secondary Education',
             'Indian Certificate of Secondary Education/Indian School Certificate',
             'State Board'
@@ -60,6 +61,7 @@ class InitialConfigurations(QWidget):
 
         # list of education levels
         self.educationLevels = [
+            '-- Select --',
             'Up to 5th class (Primary)',
             'Up to 8th class',
             'Up to 10th class (High School)',
@@ -85,17 +87,34 @@ class InitialConfigurations(QWidget):
         for each_stream in self.streams:
             self.generate_stream_options_for(each_stream)
 
-        # horizontal line (used for separating input fields from buttons)
-        self.horizontalLine = QFrame(self)
-        self.horizontalLine.setFrameShape(QFrame.HLine)
-        self.horizontalLine.setFrameShadow(QFrame.Sunken)
-
         # putting input fields and labels inside form layout
         self.formWidgetLayout.addRow(self.instituteName, self.instituteNameInputField)
         self.formWidgetLayout.addRow(self.instituteBranch, self.instituteBranchInputField)
         self.formWidgetLayout.addRow(self.affiliatedBoard, self.affiliatedBoardInputField)
         self.formWidgetLayout.addRow(self.instituteEducationLevel, self.instituteEducationLevelInputField)
         self.formWidgetLayout.addRow(self.streamOptions, self.streamsInputArea)
+
+        # horizontal line (used for separating input fields from buttons)
+        self.horizontalLine = QFrame(self)
+        self.horizontalLine.setFrameShape(QFrame.HLine)
+        self.horizontalLine.setFrameShadow(QFrame.Sunken)
+
+        # widget containing 3 things (warning prompt area, NEXT button and CANCEL button)
+        self.footer = QWidget(self)
+        self.footerLayout = QHBoxLayout(self.footer)
+
+        # message or warning prompts
+        self.warningPrompt = QLabel('')
+
+        # NEXT and CANCEL buttons
+        self.nextButton = QPushButton('Next', self.footer)
+        self.cancelButton = QPushButton('Cancel', self.footer)
+
+        # putting warning prompt, NEXT and CANCEL button altogether inside footer
+        self.footerLayout.addStretch(1)
+        self.footerLayout.addWidget(self.warningPrompt)
+        self.footerLayout.addWidget(self.nextButton)
+        self.footerLayout.addWidget(self.cancelButton)
 
         # margins for form area
         left_form_margin = 50
@@ -105,9 +124,12 @@ class InitialConfigurations(QWidget):
         self.formWidgetLayout.setContentsMargins(left_form_margin, top_form_margin, right_form_margin, bottom_form_margin)
 
         # putting all widgets inside root widget at desired place
+        self.windowLayout.setContentsMargins(30, 10, 30, 10)
         self.windowLayout.addWidget(self.prompt)
         self.windowLayout.addWidget(self.formWidget)
         self.windowLayout.addStretch(1)
+        self.windowLayout.addWidget(self.horizontalLine)
+        self.windowLayout.addWidget(self.footer)
         self.setLayout(self.windowLayout)
 
     # function which generates the stream options checkboxes
