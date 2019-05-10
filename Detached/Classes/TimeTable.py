@@ -148,8 +148,21 @@ class TimeTable:
                     i += 1
         # saving the time_table in database for semester(semester, course can be changed),
         """Inclusion of batch number and batch timings are yet to be sent and stored to database"""
-        db[time_table_collection].find_one_and_update({"course": self.course, "semester": self.semester},
-                                                      {"$set": {"latest": prev_time_tables[-1]}})
+        db[time_table_collection].find_one_and_update({"course": self.course,
+                                                       "semester": self.semester,
+                                                       "batch": self.batchNo},
+                                                      {"$set": {"time_table": prev_time_tables[-1]}})
+
+    def get_time_table(self):
+        cursor = db[time_table_collection].find_one({"course": self.course,
+                                                     "semester": self.semester,
+                                                     "batch": self.batchNo},
+                                                    {"time_table": "true", "_id": 0})
+        if cursor is not None:
+            for pair in cursor:
+                print(pair)
+        else:
+            print("Not Yet Created")
 
     @staticmethod
     def random(list_of_teachers):
