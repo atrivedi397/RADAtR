@@ -4,7 +4,7 @@ and contains all stack-screened widgets on top of one another. All the windows (
 that are to be displayed must be imported and instantiated here only.
 """
 import sys
-from PyQt5.QtGui import QFont, QPalette
+from PyQt5.QtGui import QColor, QFont, QFontDatabase
 from PyQt5.QtWidgets import (
     QApplication, QWidget, QFormLayout, QVBoxLayout, QHBoxLayout,
     QLabel, QLineEdit, QCheckBox, QComboBox
@@ -47,14 +47,18 @@ class BasicInfoInputForm(QWidget):
         self.mainLayout = QFormLayout(self)
 
         # font family, size and color
-        self.navTextFont = QFont()
-        self.navTextFont.setBold(False)
-        self.navTextFont.setPointSize(13)  # in pixels
-        self.setFont(self.navTextFont)
+        form_font = QFont("Trebuchet")
+        form_font.setPointSize(10)
+        self.setFont(form_font)
+
+        # appearance of the window (changing background as dark)
+        self.setAutoFillBackground(True)
+        self.formPalette = self.palette()
+        self.formPalette.setColor(self.foregroundRole(), QColor('white'))
+        self.setPalette(self.formPalette)
 
         # input fields widgets
         # text widgets for the window
-        self.headingPrompt = QLabel('Please provide basic information about the school.')
         self.schoolNameLabel = QLabel('School Name')
         self.schoolAddressLabel = QLabel('School Address')
         self.boardLabel = QLabel('Board Affiliated to')
@@ -141,7 +145,7 @@ class BasicInfoInputForm(QWidget):
         self.mainLayout.addRow(self.educationLevelLabel, self.educationLevelField)
         self.mainLayout.addRow(self.streamLabel, self.streamsInputArea)
         self.mainLayout.addRow(self.assetFormArea, self.timingInputArea)
-        self.mainLayout.setContentsMargins(0, 0, 0, 0)
+        self.mainLayout.setContentsMargins(10, 20, 0, 0)
         self.setLayout(self.mainLayout)
 
     # function which generates the stream options checkboxes

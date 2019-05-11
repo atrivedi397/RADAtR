@@ -60,11 +60,4 @@ class SchoolBasicInfoWindow(QWidget):
 
         self.mainLayout.setContentsMargins(0, 0, 0, 0)         # remove margins
         self.setLayout(self.mainLayout)
-
-
-if __name__ == '__main__':
-    application = QApplication(sys.argv)
-    application.setStyle('Fusion')
-    basic_info_window_object = SchoolBasicInfoWindow()
-    basic_info_window_object.show()
-    sys.exit(application.exec_())
+        self.show()
