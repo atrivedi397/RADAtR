@@ -8,6 +8,7 @@ from PyQt5.QtWidgets import (
 )
 from Global.Styles.Colors import *
 from Interfaces.BasicInfo_Nav import BasicInfoNavSection
+from Interfaces.BasicInfo_Context import BasicInfoContextSection
 
 
 # represents whole window
@@ -51,7 +52,7 @@ class SchoolBasicInfoWindow(QWidget):
         self.navigationSection = BasicInfoNavSection(self)
 
         # context section widget (to be placed on the right side)
-        self.contextSection = QWidget(self)
+        self.contextSection = BasicInfoContextSection(self)
 
         # adding above sections (i.e. navigation and context) to the main layout
         self.mainLayout.addWidget(self.navigationSection, 1)
