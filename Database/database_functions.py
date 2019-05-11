@@ -1,4 +1,4 @@
-from school_functions.database_connection import *
+from Database.database_connection import *
 
 
 # function to register the first time user/admin
