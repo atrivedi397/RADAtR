@@ -120,7 +120,7 @@ class BasicInfoInputForm(QWidget):
         self.shiftField.setFixedWidth(70)
         self.schoolHoursLabel = QLabel('School hours')
 
-        # widget for storing 2 input fields (for start timing and end timing)
+        # widget for storing 2 input fields (for start timing and end timing) into single row
         self.startEndFields = QWidget(self.timingInputArea)
         self.startEndFieldsLayout = QHBoxLayout(self.startEndFields)
         self.schoolStartTimeField = QLineEdit()  # input field 6
@@ -136,7 +136,15 @@ class BasicInfoInputForm(QWidget):
         self.timingInputAreaLayout.addRow(self.shiftLabel, self.shiftField)
         self.timingInputAreaLayout.addRow(self.schoolHoursLabel, self.startEndFields)
 
-        # adding both widget into main layout
+        # widgets for placing checkboxes for working days
+        self.workingDaysCheckboxArea = QWidget(self)
+        self.workingDaysCheckboxAreaLayout = QHBoxLayout(self.workingDaysCheckboxArea)
+        self.daysList = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun']
+        # generating checkboxes...
+        for day in self.daysList:
+            self.create_working_days_checkbox_for(day)
+
+        # adding all widgets into main layout
         self.mainLayout.addRow(self.schoolNameLabel, self.schoolNameField)
         self.mainLayout.addRow(self.schoolAddressLabel, self.schoolAddressFieldPart1)
         self.mainLayout.addRow(QLabel(''), self.schoolAddressFieldPart2)
@@ -145,6 +153,7 @@ class BasicInfoInputForm(QWidget):
         self.mainLayout.addRow(self.educationLevelLabel, self.educationLevelField)
         self.mainLayout.addRow(self.streamLabel, self.streamsInputArea)
         self.mainLayout.addRow(self.assetFormArea, self.timingInputArea)
+        self.mainLayout.addRow(self.workingDaysLabel, self.workingDaysCheckboxArea)
         self.mainLayout.setContentsMargins(10, 20, 0, 0)
         self.setLayout(self.mainLayout)
 
@@ -152,6 +161,11 @@ class BasicInfoInputForm(QWidget):
     def generate_stream_options_for(self, stream):
         stream_option_checkbox = QCheckBox(stream)
         self.streamsInputAreaLayout.addWidget(stream_option_checkbox)
+
+    # function to create checkboxes for working days
+    def create_working_days_checkbox_for(self, day):
+        working_day_checkbox = QCheckBox(day)
+        self.workingDaysCheckboxAreaLayout.addWidget(working_day_checkbox)
 
     # dummy function just for testing
     def test_calling(self):
