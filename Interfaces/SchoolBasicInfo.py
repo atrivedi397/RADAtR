@@ -23,8 +23,8 @@ class SchoolBasicInfoWindow(QWidget):
         # values are in pixels
         self.windowTopMargin = 30
         self.windowLeftMargin = 50
-        self.windowHeight = 600
-        self.windowWidth = 900
+        self.windowHeight = 660
+        self.windowWidth = 1000
 
         # appearance of the window (changing background as dark)
         self.setAutoFillBackground(True)
