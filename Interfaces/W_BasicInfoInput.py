@@ -17,6 +17,11 @@ class BasicInfoInputForm(QWidget):
         super().__init__(parent)
 
         # variable dependencies
+        self.screenCount = 0                        # used for changing index for stacked widgets
+        self.workingDaysCheckboxes = []    # contains all the checkboxes generated for working days
+        self.streamCheckboxes = []              # contains all the checkboxes generated for streams
+        self.daysSelected = []
+        self.streamSelected = []
         # list of all major Boards in India
         self.boardList = [
             '-- Select --',
@@ -96,8 +101,9 @@ class BasicInfoInputForm(QWidget):
         self.streamsInputArea = QWidget(self)                   # input field 5
         self.streamsInputAreaLayout = QVBoxLayout(self.streamsInputArea)
         # generating checkboxes...
-        for each_stream in self.streams:
-            self.generate_stream_options_for(each_stream)
+        for index in range(len(self.streams)):
+            stream_checkbox = self.generate_stream_options_for(index, self.streams[index])
+            self.streamCheckboxes.append(stream_checkbox)
 
         # ########
         # form asking about assets of the school (ie classrooms and teachers)
@@ -141,8 +147,9 @@ class BasicInfoInputForm(QWidget):
         self.workingDaysCheckboxAreaLayout = QHBoxLayout(self.workingDaysCheckboxArea)
         self.daysList = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun']
         # generating checkboxes...
-        for day in self.daysList:
-            self.create_working_days_checkbox_for(day)
+        for index in range(len(self.daysList)):
+            day_checkbox = self.create_working_days_checkbox_for(index, self.daysList[index])
+            self.workingDaysCheckboxes.append(day_checkbox)
 
         # adding all widgets into main layout
         self.mainLayout.addRow(self.schoolNameLabel, self.schoolNameField)
@@ -158,18 +165,62 @@ class BasicInfoInputForm(QWidget):
         self.setLayout(self.mainLayout)
 
     # function which generates the stream options checkboxes
-    def generate_stream_options_for(self, stream):
-        stream_option_checkbox = QCheckBox(stream)
+    def generate_stream_options_for(self, checkbox_index, stream_value):
+        stream_option_checkbox = QCheckBox(stream_value)
+        stream_option_checkbox.toggled.connect(lambda: self.process_stream_checkbox(checkbox_index))
         self.streamsInputAreaLayout.addWidget(stream_option_checkbox)
+        return stream_option_checkbox
 
     # function to create checkboxes for working days
-    def create_working_days_checkbox_for(self, day):
-        working_day_checkbox = QCheckBox(day)
+    def create_working_days_checkbox_for(self, checkbox_index, checkbox_value):
+        working_day_checkbox = QCheckBox(checkbox_value)
+        working_day_checkbox.toggled.connect(lambda: self.process_working_days_checkbox(checkbox_index))
         self.workingDaysCheckboxAreaLayout.addWidget(working_day_checkbox)
+        return working_day_checkbox
 
     # dummy function just for testing
     def test_calling(self):
         print('Function called.')
+
+    # store information into the database
+    def initialize_school_configurations(self):
+        school_name = self.schoolNameField.text()
+        address_line1 = self.schoolAddressFieldPart1.text()
+        address_line2 = self.schoolAddressFieldPart2.text()
+        address_line3 = self.schoolAddressFieldPart3.text()
+        school_address = f'{address_line1} \n {address_line2} \n {address_line3}'
+        board_name = self.boardField.currentText()
+        education_level = self.educationLevelField.currentText()
+        total_classes = self.classCountField.text()
+        total_teachers = self.teacherCountField.text()
+
+        print(f'Opted values are as follow:'
+              f'School Name: {school_name}'
+              f'School Address: {school_address}'
+              f'board Name: {board_name}'
+              f'Education Level: {education_level}'
+              f'Streams available: {self.streamSelected}'
+              f'Working Days: {self.daysSelected}'
+              f'No. of Classes: {total_classes}'
+              f'No. of teacher: {total_teachers}')
+
+    # process working days checkboxes on toggling
+    def process_working_days_checkbox(self, checkbox_index):
+        if self.workingDaysCheckboxes[checkbox_index].isChecked():
+            print(f'Appended {self.daysList[checkbox_index]}')
+            self.daysSelected.append(self.daysList[checkbox_index])
+        else:
+            print(f'Removed {self.daysList[checkbox_index]}')
+            self.daysSelected.remove(self.daysList[checkbox_index])
+
+    # process working days checkboxes on toggling
+    def process_stream_checkbox(self, checkbox_index):
+        if self.streamCheckboxes[checkbox_index].isChecked():
+            print(f'Appended {self.streams[checkbox_index]}')
+            self.daysSelected.append(self.streams[checkbox_index])
+        else:
+            print(f'Removed {self.streams[checkbox_index]}')
+            self.daysSelected.remove(self.streams[checkbox_index])
 
 
 if __name__ == '__main__':
