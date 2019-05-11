@@ -3,6 +3,7 @@ Represent a section (placed inside 'SchoolBasicInfo' Widget) that contains
 all stack-screened widgets on top of one another and a buttons sub-section.
  These widgets will be displayed/controlled by the 'next' or 'back' buttons.
 """
+from Interfaces.BasicInfo_Context_StackContainer import BasicInfoContextStackContainer
 from Interfaces.BasicInfo_Footer import BasicInfoFooter
 from PyQt5.QtGui import QFont, QPalette
 from PyQt5.QtWidgets import (
@@ -34,7 +35,7 @@ class BasicInfoContextSection(QWidget):
         """
 
         # section that will contain all the other widgets
-        self.stackedSection = QWidget(self)
+        self.stackedSection = BasicInfoContextStackContainer(self)
         self.footerSection = BasicInfoFooter(self)
 
         # font family, size and color
