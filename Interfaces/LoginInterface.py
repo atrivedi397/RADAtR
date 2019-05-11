@@ -3,6 +3,7 @@ Represent a window (Widget) for inputting all basic information about the school
 This window is meant for admins only and is displayed only after the admin login.
 """
 import sys
+from Database.database_functions import verify_admin
 from PyQt5.QtWidgets import (
     QApplication, QWidget, QVBoxLayout, QFormLayout, QHBoxLayout,
     QLineEdit, QLabel, QPushButton
@@ -53,7 +54,7 @@ class LoginWindow(QWidget):
         # buttons area widget
         self.buttonsArea = QWidget(self)
         self.buttonsAreaLayout = QHBoxLayout(self.buttonsArea)
-        self.message = ''
+        self.message = 'Login Prompt'
         self.warningPrompt = QLabel(self.message)
         self.warningPrompt.setHidden(True)
         self.loginButton = QPushButton('Login')
@@ -73,12 +74,19 @@ class LoginWindow(QWidget):
         username = self.usernameField.text()
         password = self.passwordField.text()
 
-        if password == 'root' and username == 'root':
+        # verifying administrator name and password from the database
+        verified_admin = verify_admin(username, password)
+        if verified_admin:
             self.basic_info_window = SchoolBasicInfoWindow()
-            self.basic_info_window.show()
+            self.basic_info_window.show()       # display next window (ie Basic Info Input window)
+            self.message = ''
+            self.warningPrompt.setHidden(True)
             self.setHidden(True)
         else:
             print('Wrong Credentials')
+            self.message = 'Wrong Credentials'
+            self.warningPrompt.setText(self.message)
+            self.warningPrompt.setHidden(False)
 
 
 if __name__ == '__main__':
