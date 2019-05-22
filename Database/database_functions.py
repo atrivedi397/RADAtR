@@ -41,8 +41,28 @@ def get_school_details(name=None):
     return school_details
 
 
-""" Just Testing Stuff
+# call this function for saving fee details for the first time ever
+def save_fee_details(admission_fee, re_admission_fee, tuition_fee, late_fee,
+                     vvn, computer_fee, project_fee, other_fee):
+    db[fee_details].insert({"admission_fee": admission_fee, "re_admission_fee": re_admission_fee,
+                            "tuition_fee": tuition_fee, "late_fee": late_fee, "vvn": vvn,
+                            "computer_fee": computer_fee, "project_fee": project_fee, "other_fee": other_fee})
 
+
+# call this function to get fee details from database
+def get_fee_details():
+    cursor = db[fee_details].find({}, {"_id": 0})
+    fee = {key: None for key in fee_attrib}
+    for value in cursor:
+        fee.update(value)
+
+    for k, v in fee.items():
+        print(k, " : ", v)
+
+    return fee
+
+
+""" Just Testing Stuff
 if __name__ == "__main__":
     # first_time_admin_registration("abhishek", "123456789")
     verify_admin("abhishek", "123456789")
@@ -50,4 +70,6 @@ if __name__ == "__main__":
     # save_school_details("KV", "CBSE", "12", 50, 80, 5, "Raebareli", "7:30-1:30")
     get_school_details("KV")
 
+save_fee_details(1000, 2000, 3000, 6000, 5000, 9000, 6000, 4000)
+print(get_fee_details())
 """
