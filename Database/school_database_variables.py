@@ -7,6 +7,7 @@ school_database = "school_db"
 admin_collection = "admin_table"
 school_info = "school_info"
 fee_details = "fee_details"
+student_collection = "students"
 
 # school details attributes
 school_attrib = ["name", "board", "level_of_education", "classroom_no",
@@ -15,3 +16,9 @@ school_attrib = ["name", "board", "level_of_education", "classroom_no",
 # fee details attributes
 fee_attrib = ["admission_fee", "re_admission_fee", "tuition_fee", "late_fee",
               "vvn", "computer_fee", "project_fee", "other_fee"]
+
+
+# student attributes
+stud_attributes = ["name", "guardian_name", "registration_number", "dob",
+                   "gender", "address", "category", "previous_education",
+                   "fee_status", "email", "contact_no", "disability"]
