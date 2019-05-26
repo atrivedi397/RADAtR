@@ -46,7 +46,8 @@ def save_fee_details(admission_fee, re_admission_fee, tuition_fee, late_fee,
                      vvn, computer_fee, project_fee, other_fee):
     db[fee_details].insert({"admission_fee": admission_fee, "re_admission_fee": re_admission_fee,
                             "tuition_fee": tuition_fee, "late_fee": late_fee, "vvn": vvn,
-                            "computer_fee": computer_fee, "project_fee": project_fee, "other_fee": other_fee})
+                            "computer_fee": computer_fee, "project_fee": project_fee,
+                            "other_fee": other_fee, "data_inserted": "true"})
 
 
 # call this function to get fee details from database
@@ -62,20 +63,31 @@ def get_fee_details():
     return fee
 
 
-def if_details_are_inserted():
-    cursor = db[school_info].find({"data_inserted": "true"}, {"_id": 0})
-
+# call this to check if school details are already inserted and if yes then disable school details window accordingly
+def if_school_details_are_inserted():
+    cursor = db[school_info].find_one({"data_inserted": "true"}, {"_id": 0})
     if cursor["data_inserted"] == "true":
-        print("true")
+        print("disable the school details window , data is already inserted")
+        return True
 
 
+# call this to check if fee details are already inserted and if yes then disable fee window accordingly
+def if_fee_details_are_inserted():
+    cursor = db[fee_details].find_one({"data_inserted": "true"}, {"_id": 0})
+    if cursor["data_inserted"] == "true":
+        print("disable the fee details window , data is already inserted")
+        return True
+
+
+"""
 if __name__ == "__main__":
-    """first_time_admin_registration("abhishek", "123456789")
+    first_time_admin_registration("abhishek", "123456789")
     verify_admin("abhishek", "123456789")
     verify_admin("abhishek", "12345678")
     save_school_details("KV", "CBSE", "12", 50, 80, 5, "Raebareli", "7:30-1:30")
     get_school_details("KV")
-
-save_fee_details(1000, 2000, 3000, 6000, 5000, 9000, 6000, 4000)
-print(get_fee_details())"""
-    if_details_are_inserted()
+    save_fee_details(1000, 2000, 3000, 6000, 5000, 9000, 6000, 4000)
+    print(get_fee_details())
+    print(if_school_details_are_inserted())
+    print(if_fee_details_are_inserted())
+"""
