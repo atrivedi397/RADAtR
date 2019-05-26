@@ -21,10 +21,10 @@ def verify_admin(usrname, passwd):
 # initially saving the school details
 def save_school_details(name, board, level_of_education, classroom_no,
                         total_teachers, working_days, address, working_hours):
-
     db[school_info].insert({"name": name, "board": board, "level_of_education": level_of_education,
                             "classroom_no": classroom_no, "total_teachers": total_teachers,
-                            "working_days": working_days, "address": address, "working_hours": working_hours})
+                            "working_days": working_days, "address": address, "working_hours": working_hours,
+                            "data_inserted": "true"})
     print("entered successfully")
 
 
@@ -62,14 +62,20 @@ def get_fee_details():
     return fee
 
 
-""" Just Testing Stuff
+def if_details_are_inserted():
+    cursor = db[school_info].find({"data_inserted": "true"}, {"_id": 0})
+
+    if cursor["data_inserted"] == "true":
+        print("true")
+
+
 if __name__ == "__main__":
-    # first_time_admin_registration("abhishek", "123456789")
+    """first_time_admin_registration("abhishek", "123456789")
     verify_admin("abhishek", "123456789")
     verify_admin("abhishek", "12345678")
-    # save_school_details("KV", "CBSE", "12", 50, 80, 5, "Raebareli", "7:30-1:30")
+    save_school_details("KV", "CBSE", "12", 50, 80, 5, "Raebareli", "7:30-1:30")
     get_school_details("KV")
 
 save_fee_details(1000, 2000, 3000, 6000, 5000, 9000, 6000, 4000)
-print(get_fee_details())
-"""
+print(get_fee_details())"""
+    if_details_are_inserted()
